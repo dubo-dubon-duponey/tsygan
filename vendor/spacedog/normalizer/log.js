@@ -45,6 +45,11 @@
           item.headers[nk] = item.headers[key];
           delete item.headers[key];
         });
+        // XXX SpaceDog https://github.com/spacedog-io/services/issues/45
+        if (!item.headers['User-agent'])
+          return;
+        if(item.headers['User-agent'].join)
+          item.headers['User-agent'] = item.headers['User-agent'].join(',');
       });
       console.debug(LOG_PREFIX + 'get >>', output);
       return output;
