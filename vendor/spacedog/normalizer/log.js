@@ -38,6 +38,8 @@
           attributes: item,
           relationships: {}
         });
+        if (!item.headers)
+          return;
         // XXX SpaceDog https://github.com/spacedog-io/services/issues/47
         Object.keys(item.headers).forEach(function(key){
           var nk = key.toLowerCase().capitalize();
