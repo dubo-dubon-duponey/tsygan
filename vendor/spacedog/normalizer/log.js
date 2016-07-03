@@ -26,7 +26,7 @@
         Object.keys(item).forEach(function(key){
           // JSONAPI expects dasherized keys
           var newKey = key.dasherize();
-          if(newKey != key){
+          if(newKey !== key){
             item[newKey] = item[key];
             delete item[key];
           }
@@ -38,6 +38,10 @@
           attributes: item,
           relationships: {}
         });
+        // XXX SpaceDog https://github.com/spacedog-io/services/issues/40
+        if (item.credentials.type === 'KEY' && !item.credentials.name){
+          item.credentials.type = 'ANONYMOUS';
+        }
         if (!item.headers)
           return;
         // XXX SpaceDog https://github.com/spacedog-io/services/issues/47
