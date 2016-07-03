@@ -1,6 +1,7 @@
 
 export default {
 
+  // XXX SpaceDog non-iso language list (ES) https://github.com/spacedog-io/services/issues/12
   languages: {
     "Arabic": "arabic",
     "Armenian": "armenian",
@@ -71,5 +72,5 @@ export default {
      'amount': 'amount'
      */
   }
-  
+
 };
