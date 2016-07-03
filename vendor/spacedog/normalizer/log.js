@@ -37,6 +37,14 @@
           attributes: item,
           relationships: {}
         });
+        // XXX SpaceDog https://github.com/spacedog-io/services/issues/47
+        Object.keys(item.headers).forEach(function(key){
+          var nk = key.toLowerCase().capitalize();
+          if( nk === key)
+            return;
+          item.headers[nk] = item.headers[key];
+          delete item.headers[key];
+        });
       });
       console.debug(LOG_PREFIX + 'get >>', output);
       return output;
