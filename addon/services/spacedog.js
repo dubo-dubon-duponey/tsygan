@@ -11,10 +11,12 @@ var SpaceDogLogin = window.SL = Ember.Service.extend({
   verified: false,
   error: false,
   pending: false,
+  debug: false,
 
   init: function(){
     this._super(...arguments);
     var conf = Ember.getOwner(this).resolveRegistration('config:environment');
+    this.set('debug', conf.APP.SPACEDOG_DEBUG);
     if(!conf.APP.SPACEDOG_USER)
       return;
     this.set('domain', conf.APP.SPACEDOG_BACKEND);

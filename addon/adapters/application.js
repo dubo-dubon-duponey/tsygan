@@ -127,6 +127,8 @@ export default JSONAPIAdapter.extend({
     // Cram in authentication
     options.headers.Authorization = 'Basic ' + this.get('kevinspacey.authorization');
 
+    options.headers['x-spacedog-debug']= this.get('kevinspacey.debug');
+
     // Serialize payload if there is one
     SpaceDog.serialize(options);
 
