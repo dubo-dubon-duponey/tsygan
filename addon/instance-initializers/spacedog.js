@@ -216,8 +216,22 @@ export function initialize(application) {
 
     store.createRecord('tsygan@spacedog-schemafield', {
       name: 'credentials',
-      type: 'belongsTo',
-      relatedTo: 'tsygan@spacedog-log-credential',
+      type: 'json',
+      parentModel: logSchema
+    }),
+    // Too boring to express properly
+    /*      type: 'belongsTo',
+     relatedTo: 'tsygan@spacedog-log-credential',*/
+
+    store.createRecord('tsygan@spacedog-schemafield', {
+      name: 'query',
+      type: 'json',
+      parentModel: logSchema
+    }),
+
+    store.createRecord('tsygan@spacedog-schemafield', {
+      name: 'headers',
+      type: 'json',
       parentModel: logSchema
     })
   ]);

@@ -1,4 +1,5 @@
 (function(){
+  /* global SpaceDog:false */
   'use strict';
 
   var TYPE = 'tsygan@spacedog-log';
@@ -31,7 +32,7 @@
           }
         });
         output.data.push({
-          // Logs don't have identifies on SpacedDog. Hashing the content "works" because of timestamps.
+          // Logs don't have ids on SpacedDog. Hashing the content "works" because of timestamps.
           id: SpaceDog.md5.crypt(JSON.stringify(item)),
           type: TYPE,
           attributes: item,
