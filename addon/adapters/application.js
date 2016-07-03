@@ -122,6 +122,14 @@ export default JSONAPIAdapter.extend({
     // Translate JSONAPI calls to SpaceDog inhouse routing transparently
     abuseRouting(options);
 
+    // Serialize payload if there is one
+    SpaceDog.serialize(options);
+
+    // XXX SpaceDog Workaround https://github.com/spacedog-io/services/issues/28
+    var wk = options.url.split('?');
+    wk[0] = wk[0].replace(/([\/]{2,})/g, '/');
+    options.url = wk.join('?');
+
     // Map to the final url
     options.url = 'https://' + this.get('kevinspacey.domain') + '.spacedog.io/1' + options.url;
     // Cram in authentication
@@ -129,8 +137,6 @@ export default JSONAPIAdapter.extend({
 
     options.headers['x-spacedog-debug']= this.get('kevinspacey.debug');
 
-    // Serialize payload if there is one
-    SpaceDog.serialize(options);
 
     // "Fake" operations will send an event later with fake payload
     if (options.fakeIt)
