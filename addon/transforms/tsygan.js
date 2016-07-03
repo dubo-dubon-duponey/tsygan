@@ -4,7 +4,7 @@ import Transform from 'ember-data/transform';
 export default Transform.extend({
 
   serialize: function (d, options) {
-    console.debug('com.spacedog.tsygan::transform->serialize << ', d, '*', options);
+    // console.debug('com.spacedog.tsygan::transform->serialize << ', d, '*', options);
     // Do we have a special serializer?
     if(d !== undefined && this.get('_serializer')){
       if (options.array)
@@ -19,12 +19,12 @@ export default Transform.extend({
         return options['default-value'];
       throw new SpaceDog.Error(SpaceDog.Error.NOT_INITIALIZED, 'Property ' + options.name + ' of type ' + options.type + 'that is required but undefined with no default value on serialization.');
     }
-    console.debug('com.spacedog.tsygan::transform->serialize >> ', d);
+    // console.debug('com.spacedog.tsygan::transform->serialize >> ', d);
     return d;
   },
 
   deserialize: function (d, options) {
-    console.debug('com.spacedog.tsygan::transform->deserialize << ', d, '*', options);
+    // console.debug('com.spacedog.tsygan::transform->deserialize << ', d, '*', options);
     // Do we have a special serializer?
     try{
       if(d !== undefined && this.get('_deserializer')){
@@ -40,7 +40,7 @@ export default Transform.extend({
           return options['default-value'];
         throw new SpaceDog.Error(SpaceDog.Error.NOT_INITIALIZED, 'Property ' + options.name + ' of type ' + options.type + 'that is required but undefined with no default value on deserialization.');
       }
-      console.debug('com.spacedog.tsygan::transform->deserialize >> ', d);
+      // console.debug('com.spacedog.tsygan::transform->deserialize >> ', d);
       return d;
     }catch(e){
       console.warn('!!!!! FAILURE - com.spacedog.tsygan::transform->serialize << ', e);
