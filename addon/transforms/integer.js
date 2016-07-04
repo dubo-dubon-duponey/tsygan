@@ -1,14 +1,12 @@
 import Tsygan from './tsygan';
 
-export default Tsygan.extend({
-  _serializer: function(item) {
-    return isNaN(item) ? undefined : item;
-  },
+var tra = function(item) {
+  // XXX SpaceDog https://github.com/spacedog-io/services/issues/22
+  item = parseInt(item, 10);
+  return isNaN(item) ? undefined : item;
+};
 
-  _deserializer: function(item) {
-    item = parseInt(item, 10);
-    if (isNaN(item))
-      item = undefined;
-    return item;
-  }
+export default Tsygan.extend({
+  _serializer: tra,
+  _deserializer: tra
 });

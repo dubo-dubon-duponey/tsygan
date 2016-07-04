@@ -5,6 +5,7 @@ export default Transform.extend({
 
   serialize: function (d, options) {
     // console.debug('com.spacedog.tsygan::transform->serialize << ', d, '*', options);
+    options = options || {};
     // Do we have a special serializer?
     if(d !== undefined && this.get('_serializer')){
       if (options.array)
@@ -25,6 +26,7 @@ export default Transform.extend({
 
   deserialize: function (d, options) {
     // console.debug('com.spacedog.tsygan::transform->deserialize << ', d, '*', options);
+    options = options || {};
     // Do we have a special serializer?
     try{
       if(d !== undefined && this.get('_deserializer')){
