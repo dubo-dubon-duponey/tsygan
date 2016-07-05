@@ -33,7 +33,7 @@
 
     // Urls at that point resemble "/service/identifier/foo/bar/baz"
     var service = options.url.split('/');
-    var processor = this.serialize[service[4]] || defaultSerializer;
+    var processor = this.serialize[service[1]] || defaultSerializer;
     return options.data = (processor[options.type.toLowerCase()] || processor)(options.data);
   };
 
