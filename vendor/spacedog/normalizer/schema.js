@@ -11,18 +11,27 @@
       return response;
     };
 
-    var schemafield = function(name, hash) {
+    var schemafield = function(name, hash, id) {
       console.debug(LOG_PREFIX + 'schemafield <<', name, hash);
 
-      var id, def, en, parent;
+      if(name === 'password'){
+        // XXX SpaceDog https://github.com/spacedog-io/services/issues/50
+        // For now, the pwd field in users is hardcoded because of this bug
+        hash = {
+          _type: 'string',
+          _required: true
+        };
+      }
+
+      var def, en, parent;
       if(hash._extra){
-        id = hash._extra['com.spacedog.tsygan::id'];
+        // id = hash._extra['com.spacedog.tsygan::id'];
         def = hash._extra['com.spacedog.tsygan::default'];
         en = hash._extra['com.spacedog.tsygan::enum'];
         parent = hash._extra['com.spacedog.tsygan::parent'];
-      } else {
+      }/* else {
         id = SpaceDog.md5.crypt(JSON.stringify(hash));
-      }
+      }*/
 
       var json = {
         id: id,
@@ -131,7 +140,7 @@
             type: 'tsygan@spacedog-schemafield'
           });
 
-          attrs.push(schemafield(attrName, response[schemaId][attrName]));
+          attrs.push(schemafield(attrName, response[schemaId][attrName], id));
         });
       });
 
