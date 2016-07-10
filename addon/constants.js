@@ -1,4 +1,3 @@
-
 export default {
 
   // XXX SpaceDog non-iso language list (ES) https://github.com/spacedog-io/services/issues/12
@@ -38,39 +37,26 @@ export default {
     "Thai": "thai"
   },
 
-// Our types on the left, and SpaceDog translation on the right
+// Our types on the left, and SpaceDog DSL on the right
   types: {
-    // "Fake" type used internally to force a no-op transform
-    "binary": "identifier",
-
-    // These are the only two useful numerical types for us
-    "integer": "long",
-    "number": "double",
-
-    // This is the only useful time/date type
-    "date": "timestamp",
-
-    // Plain indexable text
-    "string": "text",
-
-    // Non indexable
     "identifier": "string",
-    // "blob": "string",
-
-    // Simple types
+    "binary": "string",
     "boolean": "boolean",
-    "geocoordinates": "geopoint",
-
+    "color": "string",
+    "date": "timestamp",
+    "email": "string",
     "enum": "enum",
+    "geocoordinates": "geopoint",
+    "integer": "long",
     "json": "stash",
-    "belongsTo": "belongsTo",
-    "hasMany": "hasMany"
+    "number": "double",
+    "password": "string",
+    "regexp": "string",
+    "string": "text",
+    "url": "string",
 
-    // 'ref': 'reference',
-    /*,
-     'file': 'file',
-     'amount': 'amount'
-     */
+    // XXX there are currently no notion of reference in SpaceDog. Use identifier instead to store the id of the linked model
+    "belongsTo": "string",
+    "hasMany": "string"
   }
-
 };

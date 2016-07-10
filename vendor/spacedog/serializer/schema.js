@@ -14,31 +14,31 @@
       console.debug(LOG_PREFIX + 'put <<', jsonAPIData);
       var data = jsonAPIData.data;
 
-      var output = {};
-      // Schema root
-      output[data.id] = {
+      // Schema root: we force id as identifier field, and default to Object
+      var output = {
         _id: 'id',
         _type: 'object'
       };
 
       // Re-inject every individual field at the root
-      // if('relationships' in data)
       data.fields.forEach(function(item){
         item = schemafield(item);
-        var key = Object.keys(item).pop();
-        output[data.id][key] = item[key];
+        output[item.pop()] = item.pop();
       });
 
       // Spoof in the id field as well, unless it has been declared already
-      if(!('id' in output[data.id]))
-        output[data.id].id = {
+      // This is solely for SpaceDog - we ignore/override id definitions
+      if(!('id' in output))
+        output.id = {
           _type: 'string',
-          _required: true,
-          _array: false
+          _required: true
         };
 
-      console.debug(LOG_PREFIX + 'put >>', output);
-      return JSON.stringify(output);
+      // Create the final object, using the id as main key
+      var ret = {};
+      ret[data.id] = output;
+      console.debug(LOG_PREFIX + 'put >>', ret);
+      return JSON.stringify(ret);
     };
 
     // How to serialize SchemaFields (only called by schema serializer, since this does not exist independently in spacedog)
@@ -46,38 +46,48 @@
       console.debug(LOG_PREFIX + 'schemafield << ', jsonAPIData);
       var data = jsonAPIData.data;
 
-      var type = data.attributes.type;
       var array = data.attributes.array;
 
-      // References are represented as strings
-      if (['belongsTo', 'hasMany'].indexOf(data.attributes.type) !== -1)
-        type = 'string';
-
-      // Has-many references is an array obviously
+      // XXX should not be here
+      // Has-many references is forcedly an array - might weirdly create different _array and tsygan::attributes->array values
       if (['hasMany'].indexOf(data.attributes.type) !== -1)
         array = true;
 
-      var output = {};
-      output[data.attributes.name] = {
+      // Get a possibly previously saved SpaceDog type, or get the infered one from ours
+      var type = data.attributes.spacetypehard || data.attributes.spacetypesoft;
+      // These are hackish ways to preserve SpaceDog inner types, not to be stored
+      delete data.attributes.spacetypesoft;
+      delete data.attributes.spacetypehard;
+
+      // Start preparing the output
+      var output = {
+        // Set the _type
         _type: type,
+        // Shallow copy these to hint SpaceDog at what we do
         _required: data.attributes.required,
+        _lt: data.attributes.lt,
+        _lte: data.attributes.lte,
+        _gt: data.attributes.gt,
+        _gte: data.attributes.gte,
+        _pattern: data.attributes.pattern,
+        _examples: data.attributes.examples,
         _extra: {
-          'com.spacedog.tsygan::id': data.id,
-          'com.spacedog.tsygan::parent': data.relationships['parent-model'].data.id,
-          'com.spacedog.tsygan::default': data.attributes['default-value'],
-          'com.spacedog.tsygan::enum': data.attributes['enum-set'],
-          'com.spacedog.tsygan::related': data.attributes['related-to']
+          // Spoof in the entirety of our object here (makes it simpler to normalize) and pave the way for SpaceDog 2
+          'com.tsygan::1.0::': data
         }
       };
-      // XXX SpaceDog is very picky on arguments that can be there and when
-      if (['stash'].indexOf(data.attributes.type) === -1)
-        output[data.attributes.name]._array = array;
+      // XXX SpaceDog is very picky on arguments that can be there and when, so, add them only if allowed
+      if (['stash'].indexOf(type) === -1)
+        output._array = array;
 
-      if (['text'].indexOf(data.attributes.type) !== -1)
-        output[data.attributes.name]._language = data.attributes.language;
+      if (['text'].indexOf(type) !== -1)
+        output._language = data.attributes.language;
+
+      if (['enum'].indexOf(type) !== -1)
+        output._values = data.attributes['enum-set'];
 
       console.debug(LOG_PREFIX + 'schemafield <<', output);
-      return output;
+      return [data.attributes.name, output];
     };
 
   }).apply(this.serialize || (this.serialize = {}));

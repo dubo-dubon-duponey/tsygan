@@ -11,49 +11,94 @@
       throw new Error('Unhandled normalization on schemas for content', response);
     };
 
-    var schemafield = function(name, hash, id) {
-      console.debug(LOG_PREFIX + 'schemafield <<', name, hash);
+    // Private helper to normalize schema fields
+    var schemafield = function(name, hash, schemaId) {
+      console.debug(LOG_PREFIX + 'schemafield <<', name, hash, schemaId);
 
-      if(name === 'password'){
-        // XXX SpaceDog https://github.com/spacedog-io/services/issues/50
-        // For now, the pwd field in users is hardcoded because of this bug
+
+      // XXX SpaceDog https://github.com/spacedog-io/services/issues/50
+      // Currently, password field are mangled by the log sanitizer, restore a fake password field for the sake of the user model
+      // Spoof in a skeleton password field here
+      if(name === 'password')
         hash = {
-          _type: 'string',
-          _required: true
+          _type: 'string'
         };
+
+      // If this is a pure SpaceDog object, insert our extra section
+      if(!hash._extra)
+        hash._extra = {};
+      if(!hash._extra['com.tsygan::1.0::'])
+        hash._extra['com.tsygan::1.0::'] = {};
+
+      // Start with that
+      var json = hash._extra['com.tsygan::1.0::'];
+
+      // Preserve the SpaceDog exact type in there
+      json.attributes.spacetypehard = hash._type;
+
+      // If the object is incomplete, or if it's not a tsygan object, use SpaceDog properties to populate it
+      // These properties are "as-is"
+      ['lt', 'gt', 'lte', 'gte', 'required', 'array', 'examples', 'pattern'].forEach(function(key){
+        if(!(key in json.attributes))
+          json.attributes[key] = hash['_' + key];
+      });
+
+      // Values / enum-set mapping
+      if(!('enum-set' in json.attributes))
+        json.attributes['enum-set'] = hash['_values'];
+
+      // If it's not there, build type from spacedog (left) to ours (right)
+      if(!json.attributes.type){
+        var mapit = {
+          boolean: 'tsygan@boolean',
+          enum: 'tsygan@enum',
+          geopoint: 'tsygan@geocoordinates',
+          stash: 'tsygan@json',
+          text: 'tsygan@string',
+          integer: 'tsygan@integer',
+          long: 'tsygan@integer',
+          float: 'tsygan@number',
+          double: 'tsygan@number',
+          string: 'tsygan@identifier',
+          date: 'tsygan@date',// XXX not sure the service will accept timestamps on that
+          time: 'tsygan@date',// XXX not sure the service will accept timestamps on that
+          timestamp: 'tsygan@date',
+          ref: 'belongsTo'
+        };
+
+        // If SpaceDog introduced a type we don't understand, that's pretty bad, but we survive
+        if(!(hash._type in mapit)){
+          console.warn('ALERT: unknown SpaceDog type: ', hash._type, ' - falling back on string to leave the data as-is.');
+          hash._type = 'string';
+        }
+        json.attributes.type = mapit[hash._type];
+        // If we have a ref + array, then it's a "many" type
+        if(json.attributes.array && json.attributes.type === 'belongsTo')
+          json.attributes.type = 'hasMany';
       }
 
-      var def, en, parent;
-      if(hash._extra){
-        // id = hash._extra['com.spacedog.tsygan::id'];
-        def = hash._extra['com.spacedog.tsygan::default'];
-        en = hash._extra['com.spacedog.tsygan::enum'];
-        parent = hash._extra['com.spacedog.tsygan::parent'];
-      }/* else {
-        id = SpaceDog.md5.crypt(JSON.stringify(hash));
-      }*/
+      // No id? Generate one
+      if(!json.id)
+        json.id = SpaceDog.md5.crypt(JSON.stringify(hash));
 
-      var json = {
-        id: id,
-        type: 'tsygan@spacedog-schemafield',
-        attributes: {
-          name: name,
-          type: hash._type,
-          required: hash._required,
-          language: hash._language,
-          array: hash._array,
-          'default-value': def,
-          'enum-set': en
-        },
-        relationships: {
+      // No name? Insert it
+      if(!json.attributes.name)
+        json.attributes.name = name;
+
+      // Type is always a schemafield obviously
+      if(!json.type)
+        json.type = 'tsygan@spacedog-schemafield';
+
+      // Insert the relation ship if need be
+      if(!json.relationships)
+        json.relationships = {
           'parent-model': {
             data: {
               type: TYPE,
-              id: parent
+              id: schemaId
             }
           }
-        }
-      };
+        };
       console.debug(LOG_PREFIX + 'schemafield >>', json);
       return json;
     };
@@ -75,18 +120,18 @@
       console.debug(LOG_PREFIX + 'put <<', response);
       var payload = {meta: response};
       payload.data = {
-        id: payload.meta.id,
+        id: response.id,
         type: TYPE // XXX can't trust payload.meta.type because...
       };
-      delete payload.meta.id;
-      delete payload.meta.type;
+      delete response.id;
+      delete response.type;
       console.debug(LOG_PREFIX + 'put >>', payload);
       return payload;
     };
 
-// This will handle responses for all requests to the "/1/schema" endpoint, unless there is a more specialized one
+    // This will handle responses for all requests to the "/1/schema" endpoint, unless there is a more specialized one
     this.schema.get = function(response, url){
-      console.debug(LOG_PREFIX + 'get <<', response);
+      console.debug(LOG_PREFIX + 'get <<', JSON.stringify(response, null, 2));
 
       var singular = url.split('/').length > 5;
 
@@ -95,9 +140,8 @@
         meta: {}
       };
 
-      var attrs = [];
-      // Included records for the fields out of band
-      output.included = attrs;
+      // Denormalized fields for all schemas will leave here
+      var attrs = output.included = [];
 
       // For each schema
       Object.keys(response).forEach(function(schemaId, index) {
@@ -105,11 +149,11 @@
         var ids = [];
         // And embedded fields as well
         output.data[index] = {
-          // Ember id of the schema is the key/name
+          // Ember id of the schema is actually the name of the schema
           id: schemaId,
-          // Type is actually schema, but then
+          // Type is schema
           type: TYPE,
-          // Add the relationships ids to be linked
+          // Add the fields will be linked here
           relationships: {
             fields: {
               data: ids
@@ -121,32 +165,27 @@
         // Ignore these two entirely from SpaceDog
         delete response[schemaId]._id;
         delete response[schemaId]._type;
-        // This is our own internal ids, that are fine, thank you
+        // We don't need a definition for id fields, since we use our own internally
         delete response[schemaId].id;
-        // XXX no need for now
-        // delete response[schemaId].type;
+
         // Now, the remainder is actual fields
+       Object.keys(response[schemaId]).forEach(function(attrName){
+         // Insert the field into the denormalized map, and link it
+          var field = schemafield(attrName, response[schemaId][attrName], schemaId);
 
-
-        Object.keys(response[schemaId]).forEach(function(attrName){
-          var id;
-          if(response[schemaId][attrName]._extra)
-            id = response[schemaId][attrName]._extra['com.spacedog.tsygan::id'];
-          else
-            id = SpaceDog.md5.crypt(JSON.stringify(response[schemaId][attrName]));
-          // So, this is the "short version"
           ids.push({
-            id: id,
-            type: 'tsygan@spacedog-schemafield'
+            id: field.id,
+            type: field.type
           });
 
-          attrs.push(schemafield(attrName, response[schemaId][attrName], id));
+          attrs.push(field);
         });
       });
 
+      // Just one object? Pop it
       if(singular)
         output.data = output.data.pop();
-      console.debug(LOG_PREFIX + 'get >>', output);
+      console.debug(LOG_PREFIX + 'get >>', JSON.stringify(output, null, 2));
       return output;
     };
 
