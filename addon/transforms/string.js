@@ -1,12 +1,23 @@
 import Tsygan from './tsygan';
 
 export default Tsygan.extend({
-  _deserializer(item) {
-    return item ? item.toString() : '';
+  validate: function(item, pattern){
+    // No longer a regexp at this point - shame
+    return !pattern || (new RegExp(pattern)).test(item);
   },
 
-  _serializer(item) {
-    return item ? item.toString() : '';
+  _deserializer(item, options) {
+    if(item === undefined)
+      return;
+    item = String(item);
+    return this.get('validate')(item, options.pattern) ? item : undefined;
+  },
+
+  _serializer(item, options) {
+    if(item === undefined)
+      return;
+    item = String(item);
+    return this.get('validate')(item, options.pattern) ? item : undefined;
   }
 });
 

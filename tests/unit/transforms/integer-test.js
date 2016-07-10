@@ -2,14 +2,22 @@
 import { moduleFor, test } from 'ember-qunit';
 
 moduleFor('transform:integer', 'Unit | Transform | integer', {
-  // Specify the other units that are required for this test.
   needs: ['transform:tsygan']
 });
 
-// Replace this with your real tests.
 test('it exists', function(assert) {
   let transform = this.subject();
   assert.ok(transform);
+});
+
+test('undefined is undefined', function(assert) {
+  var transform = this.subject();
+  ['', false, null, NaN, -NaN, 'string-1234', Infinity, -Infinity, true, function(){}, [], {}, {foo: 'bar', 1: 2}, new Date(), new RegExp(), undefined, ].forEach(function(item){
+    var result1 = transform.deserialize(item);
+    var result2 = transform.serialize(item);
+    assert.equal(result1, undefined);
+    assert.equal(result2, undefined);
+  });
 });
 
 test('it does serialize & deserialize as expected (single values, no options)', function(assert) {
@@ -32,18 +40,41 @@ test('it does serialize & deserialize as expected (single values, no options)', 
   result = transform.deserialize(0x1234);
   assert.equal(result, 4660);
 
-  result = transform.deserialize(Infinity);
-  assert.equal(result, undefined);
-
-  result = transform.deserialize(-Infinity);
-  assert.equal(result, undefined);
-
   result = transform.deserialize("-1234");
   assert.equal(result, -1234);
 
-  result = transform.deserialize("foobar-1234");
+  result = transform.deserialize("-0");
+  assert.equal(result, 0);
+
+  result = transform.deserialize([1, "2"]);
+  assert.equal(result, 1);
+});
+
+test('it does honor all coercing options', function(assert) {
+  var transform = this.subject();
+  var result = transform.deserialize("1234", {lt: 1235});
+  assert.equal(result, 1234);
+  result = transform.deserialize("1234", {lt: 1234});
+  assert.equal(result, undefined);
+  result = transform.deserialize("1234", {gt: 1233});
+  assert.equal(result, 1234);
+  result = transform.deserialize("1234", {gt: 1234});
+  assert.equal(result, undefined);
+  result = transform.deserialize("1234", {lte: 1234});
+  assert.equal(result, 1234);
+  result = transform.deserialize("1234", {lte: 1233});
+  assert.equal(result, undefined);
+  result = transform.deserialize("1234", {gte: 1234});
+  assert.equal(result, 1234);
+  result = transform.deserialize("1234", {gte: 1235});
+  assert.equal(result, undefined);
+  result = transform.deserialize("1234", {gte: 1224, step: 10});
+  assert.equal(result, 1234);
+  result = transform.deserialize("1234", {gte: 1224, step: 9});
   assert.equal(result, undefined);
 });
+
+
 
 test('it does handle options "required" like a boss', function(assert) {
   var options = {

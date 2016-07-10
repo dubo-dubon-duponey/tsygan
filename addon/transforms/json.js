@@ -1,11 +1,6 @@
 import Tsygan from './tsygan';
 
-export default Tsygan.extend({
-  _deserializer(item) {
-    return item;// JSON.parse(item);
-  },
+export default Tsygan.extend({});
 
-  _serializer(item) {
-    return item;// JSON.stringify(item);
-  }
-});
+// What we get from a JSON server is already parsed
+// And we don't force serialization since it will be serialized with the rest of the payload
