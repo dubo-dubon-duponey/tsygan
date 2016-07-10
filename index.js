@@ -5,8 +5,10 @@ module.exports = {
   name: 'tsygan',
   included: function included(app) {
     app.import('vendor/spacedog/jsboot/error.js');
-    app.import('vendor/spacedog/jsboot/rfc4122-uuid.js');
     app.import('vendor/spacedog/jsboot/rfc1321-md5.js');
+    app.import('vendor/spacedog/jsboot/rfc2234-5234-abnf.js');
+    app.import('vendor/spacedog/jsboot/rfc4122-uuid.js');
+    app.import('vendor/spacedog/jsboot/rfc5322-imf.js');
     app.import('vendor/spacedog/utils/json.js');
     app.import('vendor/spacedog/utils/json.css');
 
