@@ -2,14 +2,13 @@
   'use strict';
   (function(){
 
-    var LOG_PREFIX = 'com.spacedog.tsygan::serializer->share::';
+    var LOG_PREFIX = 'com.tsygan::serializer->share::';
 
     this.share = function(jsonAPIData) {
-      console.warn(LOG_PREFIX + 'default <<>>', jsonAPIData);
-      return jsonAPIData;
+      throw new Error('Unhandled serialization on share for content', jsonAPIData);
     };
 
-    // How to serialize Schemas
+    // Putting a share just sends the payload and that's it
     this.share.put = function(jsonAPIData) {
       console.debug(LOG_PREFIX + 'put <<>>', jsonAPIData.data.attributes.file.length);
       return jsonAPIData.data.attributes.file;

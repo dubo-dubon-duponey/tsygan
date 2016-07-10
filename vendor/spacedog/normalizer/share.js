@@ -2,15 +2,14 @@
   'use strict';
 
   var TYPE = 'tsygan@spacedog-share';
-  var LOG_PREFIX = 'com.spacedog.tsygan::normalizer->share::';
+  var LOG_PREFIX = 'com.tsygan::normalizer->share::';
 
   (function(){
 
     // Shares can be individually posted or deleted, and listed globally
 
     this.share = function(response){
-      console.warn(LOG_PREFIX + 'default <<>>', response);
-      return response;
+      throw new Error('Unhandled normalization on share for content', response);
     };
 
     this.share.delete = function(response, url){
@@ -41,7 +40,7 @@
       response.results.forEach(function(item){
         Object.keys(item).forEach(function(key){
           var newKey = key.dasherize();
-          if(newKey != key){
+          if(newKey !== key){
             item[newKey] = item[key];
             delete item[key];
           }
@@ -70,7 +69,7 @@
       var output = {
         data: {
           id: id,
-          type: TYPE.dasherize(),
+          type: TYPE,
           attributes: response
         }
       };

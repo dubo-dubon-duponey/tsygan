@@ -1,11 +1,9 @@
 import { moduleFor, test } from 'ember-qunit';
 
 moduleFor('transform:string', 'Unit | Transform | string', {
-  // Specify the other units that are required for this test.
-  // needs: ['serializer:foo']
+  needs: ['transform:tsygan']
 });
 
-// Replace this with your real tests.
 test('it exists', function(assert) {
   let transform = this.subject();
   assert.ok(transform);

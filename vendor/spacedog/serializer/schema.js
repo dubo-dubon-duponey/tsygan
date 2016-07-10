@@ -1,14 +1,13 @@
 (function(){
   'use strict';
 
-  var LOG_PREFIX = 'com.spacedog.tsygan::serializer->schema::';
+  var LOG_PREFIX = 'com.tsygan::serializer->schema::';
 
   (function(){
 
     // How to serialize Schemas
     this.schema = function(jsonAPIData) {
-      console.warn(LOG_PREFIX + 'default <<>>', jsonAPIData);
-      return JSON.stringify(jsonAPIData);
+      throw new Error('Unhandled serialization on schemas for content', jsonAPIData);
     };
 
     this.schema.put = function(jsonAPIData) {

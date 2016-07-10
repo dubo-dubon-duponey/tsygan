@@ -1,14 +1,14 @@
 (function(){
+  /* globals SpaceDog:false */
   'use strict';
 
   var TYPE = 'tsygan@spacedog-schema';
-  var LOG_PREFIX = 'com.spacedog.tsygan::normalizer->schema::';
+  var LOG_PREFIX = 'com.tsygan::normalizer->schema::';
 
   (function(){
 
     this.schema = function(response){
-      console.warn(LOG_PREFIX + 'default <<>>', response);
-      return response;
+      throw new Error('Unhandled normalization on schemas for content', response);
     };
 
     var schemafield = function(name, hash, id) {

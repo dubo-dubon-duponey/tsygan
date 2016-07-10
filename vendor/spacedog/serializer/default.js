@@ -12,10 +12,10 @@
   // At the very least, we... do nothing
 
   var defaultSerializer = function(jsonAPIData){
-    console.warn('com.spacedog.tsygan::serializer->root <<>>', jsonAPIData);
-    return jsonAPIData;
+    throw new Error('Unhandled default serialization for content', jsonAPIData);
   };
 
+  // Idempotent methods transform data into query args
   var idemSerializer = function(options){
     // Process data options for methods without body
     var data = Object.getOwnPropertyNames(options.data || {}).map(function(key){
@@ -27,7 +27,7 @@
   };
 
   this.serialize = function(options){
-    // Idempotent serializers have a different strategy
+    // Idempotent serializers
     if(['POST', 'PUT', 'PATCH'].indexOf(options.type) === -1)
       return idemSerializer(options);
 
