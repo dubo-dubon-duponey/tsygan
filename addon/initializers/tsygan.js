@@ -15,6 +15,6 @@ export function initialize(application) {
 }
 
 export default {
-  name: 'spacedog',
+  name: 'tsygan',
   initialize
 };
