@@ -7,9 +7,9 @@ import Constants from 'tsygan/constants';
 const { types } = Constants;
 
 export default Model.extend({
-  typeOptions: computed('spacetypehard', function(){
+  typeOptions: computed('_spacetypehard', function(){
     // If it sealed, restrict to that
-    var sth = this.get('spacetypehard');
+    var sth = this.get('_spacetypehard');
     // Either the object is un-sealed (all types), or it is (restricted to same spacedog type)
     return Object.keys(types).filter(function(key){
       return !sth || types[key] === sth;
@@ -65,17 +65,17 @@ export default Model.extend({
   // ... unless this model was saved on the service already
   // This is to accomodate for the types that we don't know how to preserve (long vs. int, float vs. double)
   // Very ugly hack
-  spacetypehard:        attr('string'),
-  spacetypesoft:      attr('string'),
+  _spacetypehard:        attr('string'),
+  _spacetypesoft:      attr('string'),
 
   // This holds the final SpaceDog type that we will send to the service unless...
-  // XXX on save, MUST set the spacetypehard property to fix it properly
+  // XXX on save, MUST set the _spacetypehard property to fix it properly
   typeObserver: observer('type', function(){
-    this.set('spacetypesoft', types[this.get('type')]);
+    this.set('_spacetypesoft', types[this.get('type')]);
   }),
 
   seal: function(){
-    this.set('spacedoghard', this.get('spacedogsoft'));
+    this.set('_spacedoghard', this.get('_spacedogsoft'));
   },
 
   hasRelation:      computed('type', function () {

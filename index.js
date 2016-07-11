@@ -22,6 +22,8 @@ module.exports = {
     app.import('vendor/spacedog/serializer/default.js');
     app.import('vendor/spacedog/serializer/share.js');
     app.import('vendor/spacedog/serializer/schema.js');
+    // Hacks and boot
+    app.import('vendor/spacedog/hack.js');
 
     // Transforms
 /*

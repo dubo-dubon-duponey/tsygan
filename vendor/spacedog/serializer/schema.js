@@ -54,10 +54,10 @@
         array = true;
 
       // Get a possibly previously saved SpaceDog type, or get the infered one from ours
-      var type = data.attributes.spacetypehard || data.attributes.spacetypesoft;
+      var type = data.attributes._spacetypehard || data.attributes._spacetypesoft;
       // These are hackish ways to preserve SpaceDog inner types, not to be stored
-      delete data.attributes.spacetypesoft;
-      delete data.attributes.spacetypehard;
+      delete data.attributes._spacetypesoft;
+      delete data.attributes._spacetypehard;
 
       // Start preparing the output
       var output = {

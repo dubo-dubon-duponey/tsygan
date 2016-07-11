@@ -34,7 +34,7 @@
       var json = hash._extra['com.tsygan::1.0::'];
 
       // Preserve the SpaceDog exact type in there
-      json.attributes.spacetypehard = hash._type;
+      json.attributes._spacetypehard = hash._type;
 
       // If the object is incomplete, or if it's not a tsygan object, use SpaceDog properties to populate it
       // These properties are "as-is"
