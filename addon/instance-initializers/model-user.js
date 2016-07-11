@@ -1,10 +1,11 @@
 export function initialize(application) {
-  console.debug('com.tsygan::model-log-initializer: overloads a possibly existing user schema with fields we do use');
+  console.debug('com.tsygan::model-user-initializer <<');
 
   var store = application.lookup('service:store');
 
+  // XXX this depends on backend schemas to be there already
   var userSchema = store.peekRecord('tsygan@spacedog-schema', 'user');
-  if(userSchema) {
+  if (userSchema) {
     var schemaFields = userSchema.get('fields');
     if (!schemaFields.findBy('name', 'password'))
       schemaFields.pushObject(store.createRecord('tsygan@spacedog-schemafield', {
@@ -42,7 +43,10 @@ export function initialize(application) {
         required: true,
         parentModel: userSchema
       }));
+    console.debug('com.tsygan::model-user-initializer << overloading user schema');
+    return;
   }
+  console.debug('com.tsygan::model-user-initializer << nothing to do');
 }
 
 export default {

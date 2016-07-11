@@ -1,10 +1,15 @@
+// This is a convenience speed-up
 export function initialize(application) {
-  console.debug('com.tsygan::instance-initializer: create records from the retrieved payload from app creation');
+  console.debug('com.tsygan::model-from-space-initializer <<');
   var store = application.lookup('service:store');
 
-  // Register all existing models (from the retrieved payload queried during app instanciation)
+  // This is just a convenient way to speed-up instanciation by preloading a spacedog schemas payload when the backend is known
   var conf = application.resolveRegistration('config:environment');
-  store.pushPayload(conf.APP.SPACEDOG_SCHEMATICS);
+  if (conf.APP.SPACEDOG_SCHEMATICS){
+    console.debug('com.tsygan::model-from-space-initializer >> inserting early payload');
+    return store.pushPayload(conf.APP.SPACEDOG_SCHEMATICS);
+  }
+  console.debug('com.tsygan::model-from-space-initializer >> nothing to do');
 }
 
 export default {

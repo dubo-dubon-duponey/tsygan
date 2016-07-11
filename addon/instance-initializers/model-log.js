@@ -1,5 +1,5 @@
 export function initialize(application) {
-  console.debug('com.tsygan::model-log-initializer: create a record for a Logs schema');
+  console.debug('com.tsygan::model-log-initializer <<');
 
   var store = application.lookup('service:store');
 
@@ -83,6 +83,7 @@ export function initialize(application) {
       parentModel: logSchema
     })
   ]);
+  console.debug('com.tsygan::model-log-initializer >> done creating log model');
 }
 
 export default {
