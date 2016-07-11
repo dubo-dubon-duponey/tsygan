@@ -13,8 +13,7 @@
 
     // Private helper to normalize schema fields
     var schemafield = function(name, hash, schemaId) {
-      console.debug(LOG_PREFIX + 'schemafield <<', name, hash, schemaId);
-
+      // console.debug(LOG_PREFIX + 'schemafield <<', name, hash, schemaId);
 
       // XXX SpaceDog https://github.com/spacedog-io/services/issues/50
       // Currently, password field are mangled by the log sanitizer, restore a fake password field for the sake of the user model
@@ -99,7 +98,7 @@
             }
           }
         };
-      console.debug(LOG_PREFIX + 'schemafield >>', json);
+      // console.debug(LOG_PREFIX + 'schemafield >>', json);
       return json;
     };
 
