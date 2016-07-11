@@ -1,17 +1,32 @@
 import Ember from 'ember';
-const { computed } = Ember;
+const { computed, observer } = Ember;
 
-// import config from '../config/environment';
-
-var SpaceDogLogin = window.SL = Ember.Service.extend({
+export default Ember.Service.extend({
   domain: '',
   user: '',
   password: '',
-  // XXX they should reset everytime on the access values are changed
   verified: false,
   error: false,
   pending: false,
   debug: false,
+
+  store: Ember.inject.service('store'),
+  schematics: [],
+
+  // Changing any of these will reset any error, and stop any pending login attempt
+  changeObserver: observer('domain', 'user', 'password', function(){
+    this.set('verified', false);
+    this.set('error', false);
+
+    // Cancel a possibly previously running login
+    if(this.get('pending')){
+      this.get('pending').abort();
+      this.set('pending', false);
+    }
+
+    // Remove any existing model that is user defined
+    this.get('schematics');
+  }),
 
   init: function(){
     this._super(...arguments);
@@ -19,32 +34,25 @@ var SpaceDogLogin = window.SL = Ember.Service.extend({
     this.set('debug', conf.APP.SPACEDOG_DEBUG);
     if(!conf.APP.SPACEDOG_USER)
       return;
+    // If we have a config, we trust it, even if that's very wrong
     this.set('domain', conf.APP.SPACEDOG_BACKEND);
     this.set('user', conf.APP.SPACEDOG_USER);
     this.set('password', conf.APP.SPACEDOG_PASSWORD);
     this.set('verified', true);
-    /*computed('_', function() {
-     return config.APP.SPACEDOG_BACKEND;
-     }),*/
+    // Launch a verification in the background
+    this.login();
+
+    // Attach the full list of schema records
+    this.set('schematics', this.get('store').peekAll('tsygan@spacedog-schema'));
   },
 
   logout: function(){
-    this.set('user', '');
     this.set('domain', '');
+    this.set('user', '');
     this.set('password', '');
-    this.set('verified', false);
-    this.set('error', false);
-    this.set('pending', false);
   },
 
   login: function(){
-    this.set('verified', false);
-    this.set('error', false);
-
-    // Cancel a possibly previously running login
-    if(this.get('pending'))
-      this.get('pending').abort();
-
     var xhr = this.set('pending', new XMLHttpRequest());
     xhr.onreadystatechange = function(/*event*/) {
       if(xhr.readyState !== 4)
@@ -61,11 +69,18 @@ var SpaceDogLogin = window.SL = Ember.Service.extend({
     xhr.send();
   },
 
+  // internal method to retrieve schemas for a given backend
+  boot: function(){
+
+  },
+
   authorization: computed('verified', function(){
     if(this.get('verified'))
       return btoa(this.get('user') + ':' + this.get('password'));
     return;
-  })
+  }),
+
+
 
   /*
   isServiceFactory: true,
@@ -76,5 +91,3 @@ var SpaceDogLogin = window.SL = Ember.Service.extend({
 */
 
 });
-
-export default SpaceDogLogin;
