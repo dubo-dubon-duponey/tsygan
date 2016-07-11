@@ -131,7 +131,7 @@
 
     // This will handle responses for all requests to the "/1/schema" endpoint, unless there is a more specialized one
     this.schema.get = function(response, url){
-      console.debug(LOG_PREFIX + 'get <<', JSON.stringify(response, null, 2));
+      console.debug(LOG_PREFIX + 'get <<', response);
 
       var singular = url.split('/').length > 5;
 
@@ -185,7 +185,7 @@
       // Just one object? Pop it
       if(singular)
         output.data = output.data.pop();
-      console.debug(LOG_PREFIX + 'get >>', JSON.stringify(output, null, 2));
+      console.debug(LOG_PREFIX + 'get >>', output);
       return output;
     };
 
