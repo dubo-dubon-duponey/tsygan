@@ -1,7 +1,7 @@
-import Transform from 'ember-data/transform';
+import Tsygan from './tsygan';
 
-export default Transform.extend({
-  deserialize(serialized) {
+export default Tsygan.extend({
+  _deserializer(serialized) {
     var ret;
     try{
       ret = new URL(serialized);
@@ -11,7 +11,7 @@ export default Transform.extend({
     return ret;
   },
 
-  serialize(deserialized) {
+  _serializer(deserialized) {
     if(!deserialized || !deserialized.href)
       return;
     return String(deserialized);
