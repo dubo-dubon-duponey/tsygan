@@ -1,5 +1,7 @@
 (function(){
   /* globals SpaceDog:false */
+  /* eslint no-underscore-dangle:0 */
+  /* eslint strict:0*/
   'use strict';
 
   var TYPE = 'tsygan@spacedog-schema';
@@ -16,17 +18,18 @@
       // console.debug(LOG_PREFIX + 'schemafield <<', name, hash, schemaId);
 
       // XXX SpaceDog https://github.com/spacedog-io/services/issues/50
-      // Currently, password field are mangled by the log sanitizer, restore a fake password field for the sake of the user model
+      // Currently, password field are mangled by the log sanitizer, restore a fake password field
+      // for the sake of the user model
       // Spoof in a skeleton password field here
-      if(name === 'password')
+      if (name === 'password')
         hash = {
           _type: 'string'
         };
 
       // If this is a pure SpaceDog object, insert our extra section
-      if(!hash._extra)
+      if (!hash._extra)
         hash._extra = {};
-      if(!hash._extra['com.tsygan::1.0::'])
+      if (!hash._extra['com.tsygan::1.0::'])
         hash._extra['com.tsygan::1.0::'] = {};
 
       // Start with that
@@ -38,16 +41,16 @@
       // If the object is incomplete, or if it's not a tsygan object, use SpaceDog properties to populate it
       // These properties are "as-is"
       ['lt', 'gt', 'lte', 'gte', 'required', 'array', 'examples', 'pattern'].forEach(function(key){
-        if(!(key in json.attributes))
+        if (!(key in json.attributes))
           json.attributes[key] = hash['_' + key];
       });
 
       // Values / enum-set mapping
-      if(!('enum-set' in json.attributes))
-        json.attributes['enum-set'] = hash['_values'];
+      if (!('enum-set' in json.attributes))
+        json.attributes['enum-set'] = hash._values;
 
       // If it's not there, build type from spacedog (left) to ours (right)
-      if(!json.attributes.type){
+      if (!json.attributes.type){
         var mapit = {
           boolean: 'tsygan@boolean',
           enum: 'tsygan@enum',
@@ -66,30 +69,31 @@
         };
 
         // If SpaceDog introduced a type we don't understand, that's pretty bad, but we survive
-        if(!(hash._type in mapit)){
-          console.warn('ALERT: unknown SpaceDog type: ', hash._type, ' - falling back on string to leave the data as-is.');
+        if (!(hash._type in mapit)){
+          console.warn('ALERT: unknown SpaceDog type: ', hash._type,
+            ' - falling back on string to leave the data as-is.');
           hash._type = 'string';
         }
         json.attributes.type = mapit[hash._type];
         // If we have a ref + array, then it's a "many" type
-        if(json.attributes.array && json.attributes.type === 'belongsTo')
+        if (json.attributes.array && json.attributes.type === 'belongsTo')
           json.attributes.type = 'hasMany';
       }
 
       // No id? Generate one
-      if(!json.id)
+      if (!json.id)
         json.id = SpaceDog.md5.crypt(JSON.stringify(hash));
 
       // No name? Insert it
-      if(!json.attributes.name)
+      if (!json.attributes.name)
         json.attributes.name = name;
 
       // Type is always a schemafield obviously
-      if(!json.type)
+      if (!json.type)
         json.type = 'tsygan@spacedog-schemafield';
 
       // Insert the relation ship if need be
-      if(!json.relationships)
+      if (!json.relationships)
         json.relationships = {
           'parent-model': {
             data: {
@@ -182,7 +186,7 @@
       });
 
       // Just one object? Pop it
-      if(singular)
+      if (singular)
         output.data = output.data.pop();
       console.debug(LOG_PREFIX + 'get >>', output);
       return output;

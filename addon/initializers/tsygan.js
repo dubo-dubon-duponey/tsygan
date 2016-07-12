@@ -1,4 +1,3 @@
-/* global SpaceDog:false */
 export function initialize(application) {
   console.debug('com.tsygan::application-initializer <<');
 

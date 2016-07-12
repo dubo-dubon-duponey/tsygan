@@ -8,6 +8,7 @@
  */
 
 (function() {
+  /* eslint strict:0*/
   'use strict';
   /*
 
@@ -113,7 +114,8 @@
 
    */
 
-  var obsFWS = this.ABNF.repeat(this.ABNF.WSP, 1) + this.ABNF.repeat(this.ABNF.CRLF + this.ABNF.repeat(this.ABNF.WSP, 1));
+  var obsFWS = this.ABNF.repeat(this.ABNF.WSP, 1) +
+    this.ABNF.repeat(this.ABNF.CRLF + this.ABNF.repeat(this.ABNF.WSP, 1));
 
 
   /*
@@ -179,7 +181,8 @@
 
    */
 
-  var FWS = this.ABNF.alternate(this.ABNF.optional(this.ABNF.repeat(this.ABNF.WSP) + this.ABNF.CRLF) + this.ABNF.repeat(this.ABNF.WSP, 1), obsFWS);
+  var FWS = this.ABNF.alternate(this.ABNF.optional(this.ABNF.repeat(this.ABNF.WSP) + this.ABNF.CRLF) +
+    this.ABNF.repeat(this.ABNF.WSP, 1), obsFWS);
 
   var ctext = '\\x21-\\x27\\x2a-\\x5b\\x5d-\\x7e' + obsCtext;
 

@@ -3,7 +3,8 @@
  * (c) Dubo Dubon Duponey under MIT License
  */
 (function(){
-  /*globals Error: false, printStackTrace:false */
+  /* global printStackTrace:false */
+  /* eslint strict:0*/
   'use strict';
 
   // Possibly pb related to X-Domain limitation shit

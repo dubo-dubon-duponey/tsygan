@@ -3,9 +3,9 @@ import Tsygan from './tsygan';
 export default Tsygan.extend({
   _deserializer(item) {
     var ret = new Date(item);
-    try{
+    try {
       ret.toISOString();
-    }catch(e){
+    } catch (e){
       console.warn('Trying to deserialize invalid time will return undefined!', e);
       return;
     }
@@ -13,12 +13,12 @@ export default Tsygan.extend({
   },
 
   _serializer(item) {
-    if(!item || !item.toISOString)
+    if (!item || !item.toISOString)
       item = new Date(item);
     var ret;
-    try{
+    try {
       ret = item.toISOString();
-    }catch(e){
+    } catch (e){
       console.warn('Trying to serialize invalid time will return undefined!', e);
       return;
     }

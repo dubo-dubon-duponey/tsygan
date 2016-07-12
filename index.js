@@ -1,9 +1,10 @@
 /* jshint node: true */
-'use strict';
+/* eslint-env node */
 
 module.exports = {
   name: 'tsygan',
   included: function included(app) {
+    /* eslint no-underscore-dangle:0 */
     app.import('vendor/spacedog/jsboot/error.js');
     app.import('vendor/spacedog/jsboot/rfc1321-md5.js');
     app.import('vendor/spacedog/jsboot/rfc2234-5234-abnf.js');
@@ -17,11 +18,14 @@ module.exports = {
     app.import('vendor/spacedog/normalizer/log.js');
     app.import('vendor/spacedog/normalizer/share.js');
     app.import('vendor/spacedog/normalizer/schema.js');
+    app.import('vendor/spacedog/normalizer/user.js');
 
     // Serializers
     app.import('vendor/spacedog/serializer/default.js');
     app.import('vendor/spacedog/serializer/share.js');
     app.import('vendor/spacedog/serializer/schema.js');
+    app.import('vendor/spacedog/serializer/user.js');
+
     // Hacks and boot
     app.import('vendor/spacedog/hack.js');
 

@@ -8,7 +8,8 @@ export default ModelFactory.extend({
   // If you have a back-office, just set this to the final value you want to test against
   domain: '',
 
-  // Denote that we have received schemas from the backend, with no error - observe this to decide whether the app is ready or not
+  // Denote that we have received schemas from the backend, with no error - observe this to decide whether
+  // the app is ready or not
   ready: false,
 
   // Contain the possible error retrieving schemas
@@ -44,13 +45,15 @@ export default ModelFactory.extend({
             this.register(schema);
         }, this);
         // Dirty hack to call again user schema overload
-        Ember.getOwner(this).resolveRegistration('instance-initializer:tsygan@model-user').initialize(Ember.getOwner(this));
+        Ember.getOwner(this).resolveRegistration('instance-initializer:tsygan@model-user').
+        initialize(Ember.getOwner(this));
       }.bind(this), function(){
         this.set('error', 'Failed retrieving schemas from the backend! Does the backend exist?');
       }.bind(this));
   }),
 
   init: function(){
+    /* eslint no-underscore-dangle:0 */
     console.warn('com.tsygan::service::domain <<');
     this._super(...arguments);
 

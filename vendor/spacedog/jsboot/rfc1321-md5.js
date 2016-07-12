@@ -3,7 +3,10 @@
  * (c) Dubo Dubon Duponey under MIT License
  */
 (function() {
+  /* global unescape:false */
   /*jshint maxstatements:69, maxparams:7*/
+  /* eslint no-extra-parens:0, max-params:[2,7], max-statements:[2,70] */
+  /* eslint strict:0*/
   'use strict';
 
   var hexChr = '0123456789abcdef'.split('');

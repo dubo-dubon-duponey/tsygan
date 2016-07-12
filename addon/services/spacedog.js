@@ -1,4 +1,3 @@
-/* global btoa:false, XMLHttpRequest:false */
 import Ember from 'ember';
 const { computed, observer } = Ember;
 
@@ -24,7 +23,8 @@ export default Ember.Service.extend({
   // Changing any of these will reset any error, and stop any pending login attempt
   // This will NOT trigger at init time
   credentialsChangeObserver: observer('user', 'password', 'domain.domain', 'domain.ready', function(){
-    console.warn('com.tsygan::service::spacedog observing changes', this.get('user', this.get('password'), this.get('domain.ready')));
+    console.warn('com.tsygan::service::spacedog observing changes',
+      this.get('user', this.get('password'), this.get('domain.ready')));
     this.set('verified', false);
     this.set('error', false);
     // Cancel a possibly previously running login
@@ -40,6 +40,7 @@ export default Ember.Service.extend({
   }),
 
   init: function(){
+    /* eslint no-underscore-dangle:0 */
     console.warn('com.tsygan::service::spacedog <<');
     this._super(...arguments);
 

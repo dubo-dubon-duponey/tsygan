@@ -7,14 +7,14 @@ export default Tsygan.extend({
   },
 
   _deserializer(item, options) {
-    if(item === undefined)
+    if (item === undefined)
       return;
     item = String(item);
     return this.get('validate')(item, options.pattern) ? item : undefined;
   },
 
   _serializer(item, options) {
-    if(item === undefined)
+    if (item === undefined)
       return;
     item = String(item);
     return this.get('validate')(item, options.pattern) ? item : undefined;

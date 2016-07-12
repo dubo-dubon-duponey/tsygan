@@ -14,7 +14,7 @@
     /* enforce one line brace style - unfortunately, will jump the gun on curly 0 */
     "brace-style": 1,
 
-    /* Camelcase shit */
+    /* (x) Camelcase shit */
     "camelcase": 1,
     /* Cyclomatic */
     "complexity": [1, 20],
@@ -106,7 +106,7 @@
     "no-plusplus": 0,
     "no-proto": 2,
     "no-redeclare": 1,
-    "no-return-assign": 1,
+    "no-return-assign": 0,
     "no-script-url": 2,
     "no-self-compare": 2,
     "no-shadow-restricted-names": 2,
@@ -116,6 +116,7 @@
     "no-ternary": 0,
     "no-undef-init": 1,
     "no-undef": 2,
+    // (x) Warn on leading _ in property names
     "no-underscore-dangle": 1,
     "no-unreachable": 1,
     "no-unused-expressions": 1,
@@ -138,10 +139,10 @@
     "wrap-regex": 0
   },
   "globals": {
-    "jsBoot": true
+    "SpaceDog": false
   },
   "env":{
-    "node": true,
-    "browser": false
+    "node": false,
+    "browser": true
   }
 }

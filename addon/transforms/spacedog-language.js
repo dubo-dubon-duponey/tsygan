@@ -1,4 +1,3 @@
-/* global SpaceDog:false */
 import Transform from 'ember-data/transform';
 
 import Constants from 'tsygan/constants';
@@ -15,7 +14,8 @@ export default Transform.extend({
         return ret = key;
     });
     if (!ret)
-      throw new SpaceDog.Error(SpaceDog.Error.WRONG_ARGUMENTS, 'Unhandled language from SpaceDog service! (' + serialized + ')');
+      throw new SpaceDog.Error(SpaceDog.Error.WRONG_ARGUMENTS,
+        'Unhandled language from SpaceDog service! (' + serialized + ')');
     return ret;
   },
 
@@ -25,6 +25,7 @@ export default Transform.extend({
       return '';
     if (deserialized in languages)
       return languages[deserialized];
-    throw new SpaceDog.Error(SpaceDog.Error.WRONG_ARGUMENTS, 'You specified an unknown language! (' + deserialized + ')');
+    throw new SpaceDog.Error(SpaceDog.Error.WRONG_ARGUMENTS,
+      'You specified an unknown language! (' + deserialized + ')');
   }
 });

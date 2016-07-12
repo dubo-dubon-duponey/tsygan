@@ -1,4 +1,5 @@
 (function(){
+  /* eslint strict:0*/
   'use strict';
 
   // This is a hack / helper to get back schemas at app initialization time

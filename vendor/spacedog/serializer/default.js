@@ -1,4 +1,5 @@
 (function(){
+  /* eslint strict:0*/
   'use strict';
 
   // Serialization occurs just after Ember is done preparing the payloads to be sent.
@@ -28,7 +29,7 @@
 
   this.serialize = function(options){
     // Idempotent serializers
-    if(['POST', 'PUT', 'PATCH'].indexOf(options.type) === -1)
+    if (['POST', 'PUT', 'PATCH'].indexOf(options.type) === -1)
       return idemSerializer(options);
 
     // Urls at that point resemble "/service/identifier/foo/bar/baz"

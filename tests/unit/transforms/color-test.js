@@ -1,3 +1,4 @@
+/* eslint comma-dangle:0 */
 import { moduleFor, test } from 'ember-qunit';
 
 moduleFor('transform:color', 'Unit | Transform | color', {
@@ -11,7 +12,8 @@ test('it exists', function(assert) {
 
 test('bogus is undefined', function(assert) {
   var transform = this.subject();
-  [1, 1.1, {}, {foo: 'bar', 1: 2}, new Date(), new RegExp(), function(){}, Infinity, -Infinity, true, 'string', '', 0, -0, false, null, NaN, -NaN, undefined, ].forEach(function(item){
+  [1, 1.1, {}, {foo: 'bar', 1: 2}, new Date(), new RegExp(), function(){}, Infinity, -Infinity, true, 'string',
+    '', 0, -0, false, null, NaN, -NaN, undefined, ].forEach(function(item){
     var result1 = transform.deserialize(item);
     var result2 = transform.serialize(item);
     assert.equal(result1, undefined);

@@ -1,3 +1,4 @@
+/* eslint comma-dangle:0 */
 import { moduleFor, test } from 'ember-qunit';
 
 moduleFor('transform:geocoordinate', 'Unit | Transform | geocoordinate', {
@@ -11,7 +12,8 @@ test('it exists', function(assert) {
 
 test('undefined is undefined', function(assert) {
   var transform = this.subject();
-  ['', 0, -0, false, null, NaN, -NaN, 'string', 1, 1.1, Infinity, -Infinity, true, function(){}, [], {}, {foo: 'bar', 1: 2}, new Date(), new RegExp(), undefined, ].forEach(function(item){
+  ['', 0, -0, false, null, NaN, -NaN, 'string', 1, 1.1, Infinity, -Infinity, true, function(){}, [], {},
+    {foo: 'bar', 1: 2}, new Date(), new RegExp(), undefined, ].forEach(function(item){
     var result1 = transform.deserialize(item);
     var result2 = transform.serialize(item);
     assert.equal(result1, undefined);

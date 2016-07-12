@@ -1,4 +1,5 @@
 (function(){
+  /* eslint strict:0*/
   'use strict';
 
   var TYPE = 'tsygan@spacedog-share';
@@ -40,7 +41,7 @@
       response.results.forEach(function(item){
         Object.keys(item).forEach(function(key){
           var newKey = key.dasherize();
-          if(newKey !== key){
+          if (newKey !== key){
             item[newKey] = item[key];
             delete item[key];
           }

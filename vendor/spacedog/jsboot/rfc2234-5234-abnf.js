@@ -3,6 +3,8 @@
  * (c) Dubo Dubon Duponey under MIT License
  */
 (function() {
+  /* jshint -W057 */
+  /* eslint strict:0*/
   'use strict';
 
     /**
@@ -12,7 +14,7 @@
      * @summary Provides basic regexps for the augmented BNF.
      * @see http://tools.ietf.org/html/rfc5234#appendix-B.1
      */
-    this.ABNF = new (function() {
+    this.ABNF = new function() {
 
       /**
        * Note this will fail stupidly if the given range contains an opening square bracket...
@@ -40,7 +42,7 @@
         // Multiple char class in there already, need enclosing
         // XXX might nest if used improperly
         // XXX might false positive match escaped \[
-        else if (((test.length > 1) || !thing.match(/^\[[^\]]+\]$/)) && !noForce)
+        else if ((test.length > 1 || !thing.match(/^\[[^\]]+\]$/)) && !noForce)
           return '(?:' + thing + ')';
         // Simple enclosed character class, nothing special to do
         return thing;
@@ -80,24 +82,24 @@
           if (!n)
           // 0 or more matches
             suffix = '*';
-          else if (n == 1)
+          else if (n === 1)
           // 1 or more matches
             suffix = '+';
           else
           // n or more matches
             suffix = '{' + n + ',}';
-        }else if (n == m) {
-          if (n == 1)
+        } else if (n === m) {
+          if (n === 1)
           // exactly one match... kind of dull - will get a useless enclosing by the way
             suffix = '';
           else
           // Exaclty n match, where n > 1
             suffix = '{' + n + '}';
-        }else if (n) {
+        } else if (n) {
           suffix = '{' + n + ',' + m + '}';
-        }else if (m == 1) {
+        } else if (m === 1) {
           suffix = '?';
-        }else {
+        } else {
           suffix = '{,' + m + '}';
         }
         return rule + suffix;
@@ -291,6 +293,6 @@
        */
 
       this.LWSP = this.repeat(this.alternate(this.WSP, this.CRLF + this.makeClass(this.WSP)));
-    })();
+    }();
 
 }).apply(this.SpaceDog || (this.SpaceDog = {}));

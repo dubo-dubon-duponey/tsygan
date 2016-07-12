@@ -8,7 +8,7 @@ export default Tsygan.extend({
 
   _deserializer(item, options) {
     // Whatever coerces to false can NOT be an identifier
-    if(!item)
+    if (!item)
       return;
     item = String(item);
     return this.get('validate')(item, options.pattern) ? item : undefined;
@@ -16,7 +16,7 @@ export default Tsygan.extend({
 
   _serializer(item, options) {
     // Whatever coerces to false can NOT be an identifier
-    if(!item)
+    if (!item)
       return;
     item = String(item);
     return this.get('validate')(item, options.pattern) ? item : undefined;

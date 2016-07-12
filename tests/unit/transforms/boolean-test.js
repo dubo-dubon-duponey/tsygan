@@ -1,3 +1,4 @@
+/* eslint comma-dangle:0 */
 import { moduleFor, test } from 'ember-qunit';
 
 moduleFor('transform:boolean', 'Unit | Transform | boolean', {
@@ -31,7 +32,8 @@ test('undefined is undefined', function(assert) {
 
 test('true is true', function(assert) {
   var transform = this.subject();
-  ['string', 1, 1.1, Infinity, -Infinity, true, function(){}, [], [1, '2'], {}, {foo: 'bar', 1: 2}, new Date(), new RegExp()].forEach(function(item){
+  ['string', 1, 1.1, Infinity, -Infinity, true, function(){}, [], [1, '2'], {}, {foo: 'bar', 1: 2}, new Date(),
+    new RegExp()].forEach(function(item){
     var result1 = transform.deserialize(item);
     var result2 = transform.serialize(item);
     assert.equal(result1, true);

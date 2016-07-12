@@ -1,3 +1,4 @@
+/* eslint comma-dangle:0 */
 import { moduleFor, test } from 'ember-qunit';
 
 moduleFor('transform:date', 'Unit | Transform | date', {
@@ -11,7 +12,8 @@ test('it exists', function(assert) {
 
 test('undefined is undefined', function(assert) {
   var transform = this.subject();
-  ['string', '', NaN, -NaN, Infinity, -Infinity, [], function(){}, new RegExp(), {}, {foo: 'bar', 1: 2}, undefined, ].forEach(function(item){
+  ['string', '', NaN, -NaN, Infinity, -Infinity, [], function(){}, new RegExp(), {}, {foo: 'bar', 1: 2},
+    undefined, ].forEach(function(item){
     var result1 = transform.deserialize(item);
     var result2 = transform.serialize(item);
     assert.equal(result1, undefined);

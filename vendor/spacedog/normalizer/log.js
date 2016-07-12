@@ -1,5 +1,5 @@
 (function(){
-  /* global SpaceDog:false */
+  /* eslint strict:0*/
   'use strict';
 
   var TYPE = 'tsygan@spacedog-log';
@@ -26,7 +26,7 @@
         Object.keys(item).forEach(function(key){
           // Dasherise keys if need be
           var newKey = key.dasherize();
-          if(newKey !== key){
+          if (newKey !== key){
             item[newKey] = item[key];
             delete item[key];
           }
@@ -50,7 +50,7 @@
         // Headers key are not normalized, so, normalize them
         Object.keys(item.headers).forEach(function(key){
           var nk = key.toLowerCase().capitalize();
-          if( nk === key)
+          if (nk === key)
             return;
           item.headers[nk] = item.headers[key];
           delete item.headers[key];
@@ -60,7 +60,7 @@
           return;
         // XXX SpaceDog https://github.com/spacedog-io/services/issues/45
         // User-agent may be presented as a coma-split array, so, join back
-        if(item.headers['User-agent'].join)
+        if (item.headers['User-agent'].join)
           item.headers['User-agent'] = item.headers['User-agent'].join(',');
       });
       console.debug(LOG_PREFIX + 'get >>', output);

@@ -1,4 +1,4 @@
 import Identifier from './identifier';
 
-// Just a glorigied identifier
+// Just a glorified identifier
 export default Identifier.extend({});

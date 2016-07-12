@@ -1,4 +1,5 @@
 /* jshint node: true */
+/* eslint-env node */
 
 module.exports = function(environment) {
   var ENV = {
@@ -39,9 +40,9 @@ module.exports = function(environment) {
     ENV.APP.rootElement = '#ember-testing';
   }
 
-  if (environment === 'production') {
+  /*if (environment === 'production') {
 
-  }
+  }*/
 
   return ENV;
 };

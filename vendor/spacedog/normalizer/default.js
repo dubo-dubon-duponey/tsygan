@@ -1,8 +1,10 @@
 (function(){
+  /* eslint strict:0*/
   'use strict';
 
   // Normalization processes payloads returned by the SpaceDog service into JSONAPI responses
-  // It does look up for a specific normalizer, for the "endpoint" (/schema, /share, etc), and the method (GET, PUT, etc).
+  // It does look up for a specific normalizer, for the "endpoint" (/schema, /share, etc), and
+  // the method (GET, PUT, etc).
   // Example: for a POST query to the /1/schema endpoint, the following normalizing functions will be looked-up, and
   // the last existing one will be used:
   // - SpaceDog.normalize

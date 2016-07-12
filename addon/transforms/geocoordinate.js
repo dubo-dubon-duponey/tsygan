@@ -6,7 +6,7 @@ export default Tsygan.extend({
   _deserializer(item) {
     item = String(item);
     var valid = item.match(regthis);
-    if(!valid)
+    if (!valid)
       return;
     item = item.toString().split(',');
     return {
@@ -16,7 +16,7 @@ export default Tsygan.extend({
   },
 
   _serializer(item) {
-    if(!item || !item.latitude || !item.longitude)
+    if (!item || !item.latitude || !item.longitude)
       return;
     return String(item.latitude) + ',' + String(item.longitude);
   }

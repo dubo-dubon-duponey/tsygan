@@ -1,47 +1,19 @@
 (function(){
+  /* eslint strict:0*/
   'use strict';
 
   var LOG_PREFIX = 'com.tsygan::serializer->schema::';
 
   (function(){
+    /* eslint no-underscore-dangle:0 */
 
     // How to serialize Schemas
     this.schema = function(jsonAPIData) {
       throw new Error('Unhandled serialization on schemas for content', jsonAPIData);
     };
 
-    this.schema.put = function(jsonAPIData) {
-      console.debug(LOG_PREFIX + 'put <<', jsonAPIData);
-      var data = jsonAPIData.data;
-
-      // Schema root: we force id as identifier field, and default to Object
-      var output = {
-        _id: 'id',
-        _type: 'object'
-      };
-
-      // Re-inject every individual field at the root
-      data.fields.forEach(function(item){
-        item = schemafield(item);
-        output[item.pop()] = item.pop();
-      });
-
-      // Spoof in the id field as well, unless it has been declared already
-      // This is solely for SpaceDog - we ignore/override id definitions
-      if(!('id' in output))
-        output.id = {
-          _type: 'string',
-          _required: true
-        };
-
-      // Create the final object, using the id as main key
-      var ret = {};
-      ret[data.id] = output;
-      console.debug(LOG_PREFIX + 'put >>', ret);
-      return JSON.stringify(ret);
-    };
-
-    // How to serialize SchemaFields (only called by schema serializer, since this does not exist independently in spacedog)
+    // How to serialize SchemaFields (only called by schema serializer, since this does not exist
+    // independently in spacedog)
     var schemafield = this.schemafield = function(jsonAPIData) {
       console.debug(LOG_PREFIX + 'schemafield << ', jsonAPIData);
       var data = jsonAPIData.data;
@@ -49,7 +21,8 @@
       var array = data.attributes.array;
 
       // XXX should not be here
-      // Has-many references is forcedly an array - might weirdly create different _array and tsygan::attributes->array values
+      // Has-many references is forcedly an array - might weirdly create different _array and
+      // tsygan::attributes->array values
       if (['hasMany'].indexOf(data.attributes.type) !== -1)
         array = true;
 
@@ -88,6 +61,37 @@
 
       console.debug(LOG_PREFIX + 'schemafield <<', output);
       return [data.attributes.name, output];
+    };
+
+    this.schema.put = function(jsonAPIData) {
+      console.debug(LOG_PREFIX + 'put <<', jsonAPIData);
+      var data = jsonAPIData.data;
+
+      // Schema root: we force id as identifier field, and default to Object
+      var output = {
+        _id: 'id',
+        _type: 'object'
+      };
+
+      // Re-inject every individual field at the root
+      data.fields.forEach(function(item){
+        item = schemafield(item);
+        output[item.pop()] = item.pop();
+      });
+
+      // Spoof in the id field as well, unless it has been declared already
+      // This is solely for SpaceDog - we ignore/override id definitions
+      if (!('id' in output))
+        output.id = {
+          _type: 'string',
+          _required: true
+        };
+
+      // Create the final object, using the id as main key
+      var ret = {};
+      ret[data.id] = output;
+      console.debug(LOG_PREFIX + 'put >>', ret);
+      return JSON.stringify(ret);
     };
 
   }).apply(this.serialize || (this.serialize = {}));
