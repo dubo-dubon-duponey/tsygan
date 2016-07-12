@@ -1,5 +1,5 @@
 export function initialize(application) {
-  console.debug('com.tsygan::model-share-initializer <<');
+  console.debug('com.tsygan::instance-initializer::model-share <<');
 
   var store = application.lookup('service:store');
 
@@ -57,7 +57,7 @@ export function initialize(application) {
     })
   ]);
 
-  console.debug('com.tsygan::model-share-initializer >> done creating share model');
+  console.debug('com.tsygan::instance-initializer::model-share >> done creating share model');
 }
 
 export default {

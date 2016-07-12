@@ -6,35 +6,35 @@ import { belongsTo } from 'ember-data/relationships';
 import Constants from 'tsygan/constants';
 const { types } = Constants;
 
+// This defines what a schema field is, using solely tsygan transforms
+// Ideally, this could be exoressed as a schema itself
 export default Model.extend({
-  typeOptions: computed('_spacetypehard', function(){
-    // If it sealed, restrict to that
-    var sth = this.get('_spacetypehard');
-    // Either the object is un-sealed (all types), or it is (restricted to same spacedog type)
-    return Object.keys(types).filter(function(key){
-      return !sth || types[key] === sth;
-    });
-  }),
-
-  // Name of the field
+  // Name of the field - should be any string
   name:             attr('tsygan@string'),
-  // Type of the field (see transforms for full list)
+  // Type of the field (see typeOptions below for choises)
   type:             attr('tsygan@enum', {'enum-set': Object.keys(types)}),
-  // In case the field type is a string, what language is that (see transforms)
-  language:         attr('tsygan@spacedog-language', {defaultValue: 'English'}),
   // Whether the field is an array of things
   array:            attr('tsygan@boolean', {defaultValue: false}),
+  // In case the field type is a string, what language is that (see transforms)
+  language:         attr('tsygan@spacedog-language', {defaultValue: 'English'}),
   // If type is an enum, determines the list of allowed values
   enumSet:          attr('tsygan@string', {array: true}),
-  // If type is hasMany or belongsTo, list the linked model name
+  // If type is hasMany or belongsTo, this link to the model name it relates to
   relatedTo:        attr('tsygan@string'),
-
-  // Any type may provide a list of examples to display to the user (up to the implementor to use them or not).
-  // The first example in the list will always be used as a placeholder attribute for tsygan inputs
+  // Any type may provide a list of examples to display to the user (up to the implementor to use them or not,
+  // typically as placeholders in inputs).
   examples:         attr('tsygan@string', {array: true}),
+  // Whether the field should be required - if it is, a defaultValue can be specified
+  // For array-ed, the require applies for the entire array, not individual elements
+  required:         attr('tsygan@boolean', {defaultValue: false}),
+  // Default value, in case the field is required
+  // For arrays, the default is for the entire array, not for individual elements - complex objects used as
+  // defaultValues are shallow copied, so careful with modifying them
+  // A default value would usually override the first "example" as a placeholder in inputs
+  defaultValue:     attr('tsygan@string'),
 
   // Numerical types may have restrictions (<, <=, >, >= and step)
-  // Step is usable only with gte, and will coerce values to match (gte + n * step)
+  // Step is usable only with gte, and will coerce values to match `gte + n * step`
   // This apply to individual elements in an array
   step:             attr('tsygan@number'),
   gte:              attr('tsygan@number'),
@@ -48,53 +48,60 @@ export default Model.extend({
   // XXX implement lengths checks (can be interpolated from / to pattern?)
   pattern:          attr('tsygan@regexp'),
 
-  // Whether the field should be required - if it is, a defaultValue can be specified
-  // For array-ed, the require applies for the entire array to be defined
-  required:         attr('tsygan@boolean', {defaultValue: false}),
-
-  // Default value, in case the field is required
-  // For arrays, the default is for the entire array, not for individual elements - complex objects used as defaultValues are shallow copied
-  // A default value usually overrides the first example as a placeholder in tsygan inputs
-  defaultValue:     attr('tsygan@string'),
-
-  // Implement / use: _examples, _values
-
-  // Links back to the parent model this schema belong to
+  // Links back to the parent model this field belongs to
   parentModel:      belongsTo('tsygan@spacedog-schema'),
 
-  // ... unless this model was saved on the service already
+  // This returns the type choices that are available, depending on whether the object is sealed (field has already
+  // been saved to SpaceDog, or not)
+  // If the former, then only subtypes changes are allowed
+  // If the latter, then all types are available
+  typeOptions: computed('_spacetypehard', function(){
+    // If it sealed, restrict to that
+    var sth = this.get('_spacetypehard');
+    // Either the object is un-sealed (all types), or it is (restricted to same spacedog type)
+    return Object.keys(types).filter(function(key){
+      return !sth || types[key] === sth;
+    });
+  }),
+
+  // XXX all these are somewhat ugly hacks
+  // This method MUST be called after a first save, and will mark the field as "locked" on SpaceDog
+  seal: function(){
+    if (!this.get('_spacedoghard'))
+      this.set('_spacedoghard', this.get('_spacedogsoft'));
+  },
+  // The hard type will be there if the object was saved on the service already, to keep track of the actual
+  // SpaceDog type.
   // This is to accomodate for the types that we don't know how to preserve (long vs. int, float vs. double)
-  // Very ugly hack
   _spacetypehard:        attr('string'),
+  // The soft type if the SpaceDog type we will infer if we are saving for the first time
   _spacetypesoft:      attr('string'),
 
-  // This holds the final SpaceDog type that we will send to the service unless...
-  // XXX on save, MUST set the _spacetypehard property to fix it properly
+
+  // Observes the type to adjust what we will send to SpaceDog (on first save)
   typeObserver: observer('type', function(){
     this.set('_spacetypesoft', types[this.get('type')]);
   }),
 
-  seal: function(){
-    this.set('_spacedoghard', this.get('_spacedogsoft'));
-  },
-
+  // Helpers for component template
   hasRelation:      computed('type', function () {
     const currentType = this.get('type');
-    return (currentType === 'hasMany' || currentType === 'belongsTo');
+    return currentType === 'hasMany' || currentType === 'belongsTo';
   }),
 
-  // Computed properties to help templates decide what to display
   hasArray:         computed('type', function(){
     const currentType = this.get('type');
-    return (['json', 'belongsTo', 'hasMany'].indexOf(currentType) === -1);
+    return ['json', 'belongsTo', 'hasMany'].indexOf(currentType) === -1;
   }),
+
   hasLanguage:         computed('type', function(){
     const currentType = this.get('type');
-    return (currentType === 'string');
+    return currentType === 'string';
   }),
+
   hasEnum:         computed('type', function(){
     const currentType = this.get('type');
-    return (currentType === 'enum');
+    return currentType === 'enum';
   }),
 
   fieldEnumSet: computed('enumSet', {
@@ -105,20 +112,4 @@ export default Model.extend({
       return this.set('enumSet', (value || '').split(','));
     }
   })
-
-  /*, XXX non functional shit
-   defaultJSON:        computed('defaultValue', {
-   get(key) {
-   return JSON.stringify(this.get('defaultValue'));
-   },
-   set(key, value) {
-   try{
-   value = JSON.parse(value.toString());
-   }catch(e){
-   console.warn('Fail to parse', value, '. Will use it as a string');
-   }
-   console.warn('Setting to', value);
-   return this.set('defaultValue', value);
-   }
-   })*/
 });

@@ -1,5 +1,5 @@
 export function initialize(application) {
-  console.debug('com.tsygan::model-user-initializer <<');
+  console.debug('com.tsygan::instance-initializer::model-user <<');
 
   var store = application.lookup('service:store');
 
@@ -43,10 +43,10 @@ export function initialize(application) {
         required: true,
         parentModel: userSchema
       }));
-    console.debug('com.tsygan::model-user-initializer << overloading user schema');
+    console.debug('com.tsygan::instance-initializer::model-user >> overloadied user schema');
     return;
   }
-  console.debug('com.tsygan::model-user-initializer << nothing to do');
+  console.debug('com.tsygan::instance-initializer::model-user >> nothing to do');
 }
 
 export default {

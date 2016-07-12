@@ -1,61 +1,73 @@
+/* global btoa:false, XMLHttpRequest:false */
 import Ember from 'ember';
 const { computed, observer } = Ember;
 
 export default Ember.Service.extend({
-  domain: '',
+  // Don't double bind on this - changing these will trigger a login
   user: '',
   password: '',
   verified: false,
   error: false,
   pending: false,
+
   debug: false,
 
   store: Ember.inject.service('store'),
-  schematics: [],
+
+  domain: Ember.inject.service('tsygan@domain'),
+
+  // Changes on these means logout
+  domainChangeObserver: observer('domain.domain', 'domain.ready', function(){
+    this.logout();
+  }),
 
   // Changing any of these will reset any error, and stop any pending login attempt
-  changeObserver: observer('domain', 'user', 'password', function(){
+  // This will NOT trigger at init time
+  credentialsChangeObserver: observer('user', 'password', 'domain.domain', 'domain.ready', function(){
+    console.warn('com.tsygan::service::spacedog observing changes', this.get('user', this.get('password'), this.get('domain.ready')));
     this.set('verified', false);
     this.set('error', false);
-
     // Cancel a possibly previously running login
-    if(this.get('pending')){
+    if (this.get('pending')){
       this.get('pending').abort();
       this.set('pending', false);
     }
+    if (!this.get('user') || !this.get('password') || !this.get('domain.ready') || !this.get('domain.domain'))
+      return;
 
-    // Remove any existing model that is user defined
-    this.get('schematics');
+    // Login if we can
+    this.login();
   }),
 
   init: function(){
+    console.warn('com.tsygan::service::spacedog <<');
     this._super(...arguments);
+
+    // Investigate config and check what's in there
     var conf = Ember.getOwner(this).resolveRegistration('config:environment');
     this.set('debug', conf.APP.SPACEDOG_DEBUG);
-    if(!conf.APP.SPACEDOG_USER)
+
+    // Just make sure we kick this - barely observing it will not be enough
+    this.get('domain.ready');
+
+    if (!conf.APP.SPACEDOG_USER)
       return;
-    // If we have a config, we trust it, even if that's very wrong
-    this.set('domain', conf.APP.SPACEDOG_BACKEND);
     this.set('user', conf.APP.SPACEDOG_USER);
     this.set('password', conf.APP.SPACEDOG_PASSWORD);
     this.set('verified', true);
-    // Launch a verification in the background
-    this.login();
-
-    // Attach the full list of schema records
-    this.set('schematics', this.get('store').peekAll('tsygan@spacedog-schema'));
   },
 
   logout: function(){
-    this.set('domain', '');
+    console.warn('com.tsygan::service::spacedog logout');
     this.set('user', '');
     this.set('password', '');
   },
 
   login: function(){
+    console.warn('com.tsygan::service::spacedog attempt at login');
     var xhr = this.set('pending', new XMLHttpRequest());
     xhr.onreadystatechange = function(/*event*/) {
-      if(xhr.readyState !== 4)
+      if (xhr.readyState !== 4)
         return;
 
       this.set('pending', false);
@@ -64,30 +76,14 @@ export default Ember.Service.extend({
       this.set('error', xhr.status);
     }.bind(this);
 
-    xhr.open('GET', 'https://' + this.get('domain') + '.spacedog.io/1/login', true);
+    xhr.open('GET', 'https://' + this.get('domain.domain') + '.spacedog.io/1/login', true);
     xhr.setRequestHeader('Authorization', 'Basic ' + btoa(this.get('user') + ':' + this.get('password')));
     xhr.send();
   },
 
-  // internal method to retrieve schemas for a given backend
-  boot: function(){
-
-  },
-
   authorization: computed('verified', function(){
-    if(this.get('verified'))
+    if (this.get('verified'))
       return btoa(this.get('user') + ':' + this.get('password'));
-    return;
-  }),
-
-
-
-  /*
-  isServiceFactory: true,
-
-  create: function(){
-    return new jsBoot.services.SingleApp(config.APP.APP_KEY, config.APP.LOCK_TIME);
-  }
-*/
+  })
 
 });
