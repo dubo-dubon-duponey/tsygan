@@ -27,29 +27,26 @@ export default ModelFactory.extend({
     this.set('ready', false);
     this.set('error', false);
 
-    // Remove any backend defined model, and delete the schemas from the store
+    // Unregister any schema based model
     this.get('store').peekAll('tsygan@spacedog-schema').forEach(function(schema){
-      if (!schema.get('id').startsWith('tsygan@')){
-        this.unregister(schema);
-        this.get('store').unloadRecord(schema);
-      }
+      this.unregister(schema);
     }, this);
+    // Remove everything in the store - can't take the risk of leaking data from one backend to the other
+    this.get('store').unloadAll();
 
     // Boot again now - will trigger a full schema list download
-    if (this.get('domain'))
+    if (this.get('domain')) {
       this.get('store').findAll('tsygan@spacedog-schema').then(function(){
         this.set('ready', true);
-        // Register all backend models now
-        this.get('store').peekAll('tsygan@spacedog-schema').forEach(function(schema){
-          if (!schema.get('id').startsWith('tsygan@'))
-            this.register(schema);
-        }, this);
-        // Dirty hack to call again user schema overload
-        Ember.getOwner(this).resolveRegistration('instance-initializer:tsygan@model-user').
-        initialize(Ember.getOwner(this));
+        // Dirty hack to call insert again system schemas
+        var registry = Ember.getOwner(this);
+        registry.resolveRegistration('instance-initializer:tsygan@model-log').initialize(registry);
+        registry.resolveRegistration('instance-initializer:tsygan@model-share').initialize(registry);
+        registry.resolveRegistration('instance-initializer:tsygan@model-user').initialize(registry);
+        registry.resolveRegistration('instance-initializer:tsygan@tsygan').initialize(registry);
       }.bind(this), function(){
         this.set('error', 'Failed retrieving schemas from the backend! Does the backend exist?');
-      }.bind(this));
+      }.bind(this));}
   }),
 
   init: function(){
