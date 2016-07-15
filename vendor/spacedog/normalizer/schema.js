@@ -148,6 +148,9 @@
 
       // For each schema
       Object.keys(response).forEach(function(schemaId, index) {
+        // Damn!
+        if (schemaId === 'debug')
+          return;
         // We will have relations to fields
         var ids = [];
         // And embedded fields as well
