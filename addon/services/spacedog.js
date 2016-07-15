@@ -5,7 +5,7 @@ export default Ember.Service.extend({
   // Don't double bind on this - changing these will trigger a login
   user: '',
   password: '',
-  verified: false,
+  ready: false,
   error: false,
   pending: false,
 
@@ -15,9 +15,9 @@ export default Ember.Service.extend({
 
   domain: Ember.inject.service('tsygan@domain'),
 
-  // Changes on these means logout
   domainChangeObserver: observer('domain.domain', 'domain.ready', function(){
-    this.logout();
+    // Should we force a logout?
+    // this.logout();
   }),
 
   // Changing any of these will reset any error, and stop any pending login attempt
@@ -25,7 +25,10 @@ export default Ember.Service.extend({
   credentialsChangeObserver: observer('user', 'password', 'domain.domain', 'domain.ready', function(){
     console.warn('com.tsygan::service::spacedog observing changes',
       this.get('user', this.get('password'), this.get('domain.ready')));
-    this.set('verified', false);
+    if (this.get('ready')){
+      // XXX we were previously logged-in - we might be leaking data here - should we reset?
+    }
+    this.set('ready', false);
     this.set('error', false);
     // Cancel a possibly previously running login
     if (this.get('pending')){
@@ -55,7 +58,7 @@ export default Ember.Service.extend({
       return;
     this.set('user', conf.APP.SPACEDOG_USER);
     this.set('password', conf.APP.SPACEDOG_PASSWORD);
-    this.set('verified', true);
+    this.set('ready', true);
   },
 
   logout: function(){
@@ -73,8 +76,10 @@ export default Ember.Service.extend({
 
       this.set('pending', false);
       if (xhr.status === 200)
-        return this.set('verified', true);
+        return this.set('ready', true);
       this.set('error', xhr.status);
+      // Reset password on error
+      this.set('password', false);
     }.bind(this);
 
     xhr.open('GET', 'https://' + this.get('domain.domain') + '.spacedog.io/1/login', true);
@@ -82,8 +87,9 @@ export default Ember.Service.extend({
     xhr.send();
   },
 
-  authorization: computed('verified', function(){
-    if (this.get('verified'))
+  authorization: computed('ready', function(){
+    // Returns only if we completed a successful login
+    if (this.get('ready'))
       return btoa(this.get('user') + ':' + this.get('password'));
   })
 

@@ -12,6 +12,9 @@ export default ModelFactory.extend({
   // the app is ready or not
   ready: false,
 
+  // Pending operations
+  pending: false,
+
   // Contain the possible error retrieving schemas
   error: false,
 
@@ -23,20 +26,28 @@ export default ModelFactory.extend({
   // This does NOT take care of dynamic model modification / destruction
   // This leaves the systems schemas alone
   domainChangeObserver: observer('domain', function(){
-    // Reset
-    this.set('ready', false);
+    // If we previously were in a ready state, purge everything with fire
+    if (this.get('ready', true)){
+      // Unregister any schema based model
+      this.get('store').peekAll('tsygan@spacedog-schema').forEach(function(schema){
+        this.unregister(schema);
+      }, this);
+
+      // Remove everything in the store - can't take the risk of leaking data from one backend to the other
+      this.get('store').unloadAll();
+
+      // Reset
+      this.set('ready', false);
+    }
+
     this.set('error', false);
+    this.set('pending', false);
 
-    // Unregister any schema based model
-    this.get('store').peekAll('tsygan@spacedog-schema').forEach(function(schema){
-      this.unregister(schema);
-    }, this);
-    // Remove everything in the store - can't take the risk of leaking data from one backend to the other
-    this.get('store').unloadAll();
-
-    // Boot again now - will trigger a full schema list download
+    // Boot now, if domain is not empty - will trigger a full schema list download
     if (this.get('domain')) {
+      this.set('pending', true);
       this.get('store').findAll('tsygan@spacedog-schema').then(function(){
+        this.set('pending', false);
         this.set('ready', true);
         // Dirty hack to call insert again system schemas
         var registry = Ember.getOwner(this);
@@ -45,6 +56,7 @@ export default ModelFactory.extend({
         registry.resolveRegistration('instance-initializer:tsygan@model-user').initialize(registry);
         registry.resolveRegistration('instance-initializer:tsygan@tsygan').initialize(registry);
       }.bind(this), function(){
+        this.set('pending', false);
         this.set('error', 'Failed retrieving schemas from the backend! Does the backend exist?');
       }.bind(this));}
   }),

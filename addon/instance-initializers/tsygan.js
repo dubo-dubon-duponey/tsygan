@@ -1,3 +1,4 @@
+import Ember from 'ember';
 const { computed } = Ember;
 
 export function initialize(application) {
