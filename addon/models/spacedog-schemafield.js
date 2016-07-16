@@ -67,9 +67,14 @@ export default Model.extend({
   // XXX all these are somewhat ugly hacks
   // This method MUST be called after a first save, and will mark the field as "locked" on SpaceDog
   seal: function(){
-    if (!this.get('_spacedoghard'))
-      this.set('_spacedoghard', this.get('_spacedogsoft'));
+    if (!this.get('_spacetypehard'))
+      this.set('_spacetypehard', this.get('_spacetypesoft'));
   },
+
+  sealed: computed('_spacetypehard', function(){
+    return !!this.get('_spacetypehard');
+  }),
+
   // The hard type will be there if the object was saved on the service already, to keep track of the actual
   // SpaceDog type.
   // This is to accomodate for the types that we don't know how to preserve (long vs. int, float vs. double)
@@ -101,8 +106,11 @@ export default Model.extend({
   }),
 
   hasLanguage:         computed('type', function(){
-    const currentType = this.get('type');
-    return currentType === 'string';
+    return this.get('type') === 'string';
+  }),
+
+  hasPattern:         computed('type', function(){
+    return ['string', 'identifier', 'password'].indexOf(this.get('type')) !== -1;
   }),
 
   hasBoundaries:         computed('type', function(){
