@@ -1,4 +1,3 @@
-/* global SpaceDog:false */
 import Ember from 'ember';
 import JSONAPIAdapter from 'ember-data/adapters/json-api';
 
@@ -21,9 +20,9 @@ var abuseRouting = function(options){
       // Remove the trick prefix
       options.url = options.url.replace(/^\/(?:tsygan@)?spacedog-([^/]+)/, '/$1');
       // Get the actual endpoint
-      switch(secondary.shift()){
+      switch (secondary.shift()){
         case 'share':
-          switch(options.type) {
+          switch (options.type) {
             // Share creation gymnastic
             case 'POST':
               // Add the filename to the url
@@ -36,12 +35,12 @@ var abuseRouting = function(options){
             case 'DELETE':
               // We use id*filename as internal ids
               // Replace * with a / to turn it back into actionable delete
-              options.url = options.url.replace(/([/][^/*]+)([*])/, "$1/");
+              options.url = options.url.replace(/([/][^/*]+)([*])/, '$1/');
               break;
           }
           break;
         case 'schema':
-          switch(options.type){
+          switch (options.type){
             case 'POST':
               // Creation as an update
               options.url += '/' + options.data.data.id;
@@ -49,7 +48,7 @@ var abuseRouting = function(options){
           }
           break;
         case 'schemafield':
-          switch(options.type){
+          switch (options.type){
             case 'DELETE':
               console.warn('gonna fake it');
               options.fakeIt = true;
@@ -66,7 +65,7 @@ var abuseRouting = function(options){
   }
 
   // Change methods to accomodate SpaceDog oddities
-  switch(options.type){
+  switch (options.type){
     // Record modification uses PUT instead of PATCH
     case 'PATCH':
       options.type = 'PUT';
@@ -81,6 +80,7 @@ var abuseRouting = function(options){
 
 
 export default JSONAPIAdapter.extend({
+  domain: Ember.inject.service('tsygan@domain'),
   kevinspacey: Ember.inject.service('tsygan@spacedog'),
 
   _ajaxRequest: function(options) {
@@ -93,7 +93,8 @@ export default JSONAPIAdapter.extend({
       Ember.getOwner(this).lookup('service:store').createRecord('alert', {
         type: 'danger',
         title: 'SpaceDog service erroring out!',
-        message: 'Status: ' + (textStatus || 'NOTHING!') + ' - ErrorThrown: ' + (errorThrown || 'Service is tits-up with no specific error thrown!'),
+        message: 'Status: ' + (textStatus || 'NOTHING!') + ' - ErrorThrown: ' +
+        (errorThrown || 'Service is tits-up with no specific error thrown!'),
         destruct: 0
       });
 
@@ -114,9 +115,10 @@ export default JSONAPIAdapter.extend({
     };
 
     // Reopen data silently
-    try{
+    try {
       options.data = JSON.parse(options.data);
-    }catch(e){
+    } catch (e){
+      /* eslint no-empty:0 */
     }
 
     // Translate JSONAPI calls to SpaceDog inhouse routing transparently
@@ -131,9 +133,11 @@ export default JSONAPIAdapter.extend({
     options.url = wk.join('?');
 
     // Map to the final url
-    options.url = 'https://' + this.get('kevinspacey.domain') + '.spacedog.io/1' + options.url;
-    // Cram in authentication
-    options.headers.Authorization = 'Basic ' + this.get('kevinspacey.authorization');
+    options.url = 'https://' + this.get('domain.domain') + '.spacedog.io/1' + options.url;
+    // Cram in authentication - only if we have positive credentials
+    // XXX https://github.com/spacedog-io/services/issues/53
+    if (this.get('kevinspacey.authorization'))
+      options.headers.Authorization = 'Basic ' + this.get('kevinspacey.authorization');
 
     options.headers['x-spacedog-debug']= this.get('kevinspacey.debug');
 
@@ -143,7 +147,8 @@ export default JSONAPIAdapter.extend({
       return setTimeout(options.success, 1,
         undefined, 200, {
           status: 200,
-          responseText: '{"data": {"id": "' + decodeURIComponent(options.url.split('/').pop()) + '", "type": "tsygan@spacedog-schemafield"}}',
+          responseText: '{"data": {"id": "' + decodeURIComponent(options.url.split('/').pop()) +
+          '", "type": "tsygan@spacedog-schemafield"}}',
           getAllResponseHeaders: function(){
             return 'Content-Type: application/json;charset=UTF-8';
           }
@@ -153,11 +158,13 @@ export default JSONAPIAdapter.extend({
     Ember.$.ajax(options);
   },
 
-  // XXX the REST implementation forces stringification of the request body, regardless of what it is (doesn't work for files, obviously)
+  // XXX the REST implementation forces stringification of the request body, regardless of what it is
+  // (doesn't work for files, obviously)
   // So, lie about it (and don't pay the perf penaly either) :)
   ajaxOptions(url, type, options) {
+    /* eslint no-underscore-dangle:0 */
     var d;
-    if(options){
+    if (options){
       d = options.data;
       delete options.data;
     }
