@@ -83,6 +83,12 @@ export default Model.extend({
     this.set('_spacetypesoft', types[this.get('type')]);
   }),
 
+  init: function(){
+    /* eslint no-dangle-underscore:0 */
+    this._super(...arguments);
+    this.set('_spacetypesoft', types[this.get('type')]);
+  },
+
   // Helpers for component template
   hasRelation:      computed('type', function () {
     const currentType = this.get('type');
@@ -97,6 +103,10 @@ export default Model.extend({
   hasLanguage:         computed('type', function(){
     const currentType = this.get('type');
     return currentType === 'string';
+  }),
+
+  hasBoundaries:         computed('type', function(){
+    return ['integer', 'number'].indexOf(this.get('type')) !== -1;
   }),
 
   hasEnum:         computed('type', function(){

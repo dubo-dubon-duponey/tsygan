@@ -27,10 +27,10 @@
         array = true;
 
       // Get a possibly previously saved SpaceDog type, or get the infered one from ours
-      var type = data.attributes._spacetypehard || data.attributes._spacetypesoft;
+      var type = data.attributes['-spacetypehard'] || data.attributes['-spacetypesoft'];
       // These are hackish ways to preserve SpaceDog inner types, not to be stored
-      delete data.attributes._spacetypesoft;
-      delete data.attributes._spacetypehard;
+      delete data.attributes['-spacetypesoft'];
+      delete data.attributes['-spacetypehard'];
 
       // Start preparing the output
       var output = {
@@ -76,7 +76,7 @@
       // Re-inject every individual field at the root
       data.fields.forEach(function(item){
         item = schemafield(item);
-        output[item.pop()] = item.pop();
+        output[item.shift()] = item.shift();
       });
 
       // Spoof in the id field as well, unless it has been declared already
