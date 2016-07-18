@@ -127,7 +127,23 @@ export default Model.extend({
       return (this.get('enumSet') || []).join(',');
     },
     set(key, value) {
-      return this.set('enumSet', (value || '').split(','));
+      if (this.get('_oldEnumSetValue') && value === this.get('_oldEnumSetValue'))
+        return value;
+      this.set('enumSet', (value || '').split(','));
+      return this.set('_oldEnumSetValue', value);
+    }
+  }),
+
+  fieldExamples: computed('examples', {
+    get(/*key*/) {
+      return (this.get('examples') || []).join(',');
+    },
+    set(key, value) {
+      if (this.get('_oldExamplesValue') && value === this.get('_oldExamplesValue'))
+        return value;
+      this.set('examples', (value || '').split(','));
+      return this.set('_oldExamplesValue', value);
     }
   })
+
 });
