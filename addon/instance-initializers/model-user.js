@@ -21,6 +21,7 @@ export function initialize(application) {
       schemaFields.pushObject(store.createRecord('tsygan@spacedog-schemafield', {
         name: 'passwordResetCode',
         type: 'identifier',
+        system: true,
         _spacetypehard: 'string',
         required: false,
         parentModel: userSchema
