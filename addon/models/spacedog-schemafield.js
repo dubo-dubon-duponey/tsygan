@@ -32,6 +32,9 @@ export default Model.extend({
   // defaultValues are shallow copied, so careful with modifying them
   // A default value would usually override the first "example" as a placeholder in inputs
   defaultValue:     attr('tsygan@string'),
+  // Denote that a property is a read-only, system property (eg: think "reset code")
+  // XXX no UI for that right now
+  system:         attr('tsygan@boolean'),
 
   // Numerical types may have restrictions (<, <=, >, >= and step)
   // Step is usable only with gte, and will coerce values to match `gte + n * step`
@@ -130,6 +133,18 @@ export default Model.extend({
       if (this.get('_oldEnumSetValue') && value === this.get('_oldEnumSetValue'))
         return value;
       this.set('enumSet', (value || '').split(','));
+      return this.set('_oldEnumSetValue', value);
+    }
+  }),
+
+  fieldPattern: computed('pattern', {
+    get(/*key*/) {
+      return this.get('pattern') ? this.get('pattern').source : '';
+    },
+    set(key, value) {
+      if (this.get('_oldEnumSetValue') && value === this.get('_oldEnumSetValue'))
+        return value;
+      this.set('pattern', value ? new RegExp(value) : '');
       return this.set('_oldEnumSetValue', value);
     }
   }),
