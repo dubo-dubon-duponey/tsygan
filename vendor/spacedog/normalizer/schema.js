@@ -29,11 +29,9 @@
       // If this is a pure SpaceDog object, insert our extra section
       if (!hash._extra)
         hash._extra = {};
-      if (!hash._extra['com.tsygan::1.0::'])
-        hash._extra['com.tsygan::1.0::'] = {};
 
       // Start with that
-      var json = hash._extra['com.tsygan::1.0::'];
+      var json = hash._extra['com.tsygan::1.0::'] || {attributes: {}};
 
       // Preserve the SpaceDog exact type in there
       json.attributes['-spacetypehard'] = hash._type;

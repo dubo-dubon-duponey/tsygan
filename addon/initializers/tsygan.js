@@ -14,7 +14,7 @@ export function initialize(application) {
       } catch (e) {
         // This would only happen if upstream returned a 200 with a broken JSON payload
         // (eg: broken proxy, or very broken SpaceDog instance)
-        throw new SpaceDog.Error(SpaceDog.Error.WRONG_ARGUMENTS, 'SpaceDog schemas cant be parsed: ' + data);
+        throw new SpaceDog.Error(SpaceDog.Error.WRONG_ARGUMENTS, 'SpaceDog schemas cant be parsed: ' + e + ' ' + data);
       }
     }, function(xhr){
       if (xhr.status === 0){
